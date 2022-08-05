@@ -3,6 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import Charts from './charts';
 import LimitedItems from './limitedItems';
 import Image from 'next/image'
+import Button from "./button";
 
 export default function Dashboard() {
     const { wallet, disconnect, publicKey } = useWallet();
@@ -12,34 +13,35 @@ export default function Dashboard() {
     
     const menuItems = [
         {
-            title: '🤖 Dashboard',
+            title: 'Dashboard',
             loc: 'charts',
             btnAction: () => setTab('charts'),
             component: Charts
         },
         {
-            title: '🛍️ Limited items',
+            title: 'Limited items',
             loc: 'limited-items',
             btnAction: () => setTab('limited-items'),
             component: LimitedItems
         },
         {
-            title: '🖼️ NFTs',
+            title: 'NFTs',
             loc: 'nfts',
             btnAction: () => setTab('nfts'),
             component: null
         },
         {
-            title: '🤑 Tokens',
+            title: 'Tokens',
             loc: 'tokens',
             btnAction: () => setTab('tokens'),
             component: null
         },
         {
-            title: '✌️ Sign Out (' + publicKey.toString().substring(0, 6) + '...)',
+            title: 'Sign Out (' + publicKey.toString().substring(0, 6) + '...)',
             loc: 'sign-out',
             btnAction: () =>  disconnect().catch(() => {}),
-            component: null
+            component: null,
+            styles : "font-bold"
         }
     ];
 
@@ -56,12 +58,12 @@ export default function Dashboard() {
                         <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white p-2">Mato Tools</span>
                     </p>
                     <ul className="space-y-2">
-                    {menuItems.map(({ loc, title, btnAction }) => (
+                    {menuItems.map(({ loc, title, btnAction,styles }) => (
                         <li>
-                            <a href="#" onClick={btnAction} className={"flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white  " + (
+                            <a href="#" onClick={btnAction} className={"flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white " + (
                                 tab === loc ? ' bg-sky-100': 'hover:bg-gray-100 dark:hover:bg-gray-700'
                             )}>
-                            <span className="flex-1 ml-3 whitespace-nowrap">{title}</span>
+                            <span className={"flex-1 ml-3 whitespace-nowrap text-sm " + styles}>{title}</span>
                             </a>
                         </li>
                     ))}
