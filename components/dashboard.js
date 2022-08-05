@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useWallet } from '@solana/wallet-adapter-react';
 import Charts from './charts';
 import LimitedItems from './limitedItems';
-import Image from 'next/image'
-import Button from "./button";
 
 export default function Dashboard() {
     const { wallet, disconnect, publicKey } = useWallet();
