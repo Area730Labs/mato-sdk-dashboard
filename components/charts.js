@@ -112,7 +112,7 @@ export default function Charts() {
 
     return (
         <>
-            <p class="not-italic text-center text-xl font-bold m-2.5 mt-4">Game stats</p>
+            <p className="not-italic text-center text-xl font-bold m-2.5 mt-4">Game stats</p>
 
             <div className="relative flex flex-col  break-words m-4 border-b border-gray-200 bg-blueGray-700 p-2">
                 <div className="rounded-t mb-0 px-4 py-3 bg-transparent">

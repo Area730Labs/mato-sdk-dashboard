@@ -57,7 +57,7 @@ export default function Dashboard() {
                     </p>
                     <ul className="space-y-2">
                     {menuItems.map(({ loc, title, btnAction }) => (
-                        <li>
+                        <li key={title}>
                             <a href="#" onClick={btnAction} className={"flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white  " + (
                                 tab === loc ? ' bg-sky-100': 'hover:bg-gray-100 dark:hover:bg-gray-700'
                             )}>

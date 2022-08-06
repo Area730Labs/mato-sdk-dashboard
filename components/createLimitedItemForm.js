@@ -22,13 +22,14 @@ import {
 import React, { useState } from "react";
 
 export default function CreateLimitedItemForm(props) {
+    
 
     const [formValues, setFormValues] = useState({
         itemName: '',
-        itemUid: '',
+        gameUid: '',
         supply: 0,
         price: 0,
-        token: ''
+        tokenSymbol: ''
     });
 
     const changeHandler = e => {
@@ -40,12 +41,24 @@ export default function CreateLimitedItemForm(props) {
     }
 
     const canSave = formValues.itemName.length > 0 
-                    && formValues.itemUid.length > 0 
+                    && formValues.gameUid.length > 0 
                     && formValues.supply > 0 
-                    && formValues.token.length > 0;
+                    && formValues.tokenSymbol.length > 0;
+
+    const onClose = () => {
+        props.onClose();
+
+        setFormValues({
+            itemName: '',
+            gameUid: '',
+            supply: 0,
+            price: 0,
+            tokenSymbol: ''
+        });
+    };
 
     return (
-        <Modal onClose={props.onClose} isOpen={props.isOpen} isCentered closeOnOverlayClick={false}>
+        <Modal onClose={onClose} isOpen={props.isOpen} isCentered closeOnOverlayClick={false}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Create new limited item</ModalHeader>
@@ -56,7 +69,7 @@ export default function CreateLimitedItemForm(props) {
                         <Input value={formValues.itemName} onChange={changeHandler} name='itemName' />
 
                         <FormLabel mt='0.5rem'>Game uid</FormLabel>
-                        <Input value={formValues.itemUid} onChange={changeHandler} name='itemUid' />
+                        <Input value={formValues.gameUid} onChange={changeHandler} name='gameUid' />
 
                         <FormLabel  mt='0.5rem'>Supply</FormLabel>
                         <NumberInput>
@@ -69,7 +82,7 @@ export default function CreateLimitedItemForm(props) {
                         </NumberInput>
 
                         <FormLabel mt='0.5rem'>Token</FormLabel>
-                        <Select placeholder='Select option' value={formValues.token} onChange={changeHandler} name='token'>
+                        <Select placeholder='Select option' value={formValues.tokenSymbol} onChange={changeHandler} name='tokenSymbol'>
                             <option value='USDC'>USDC</option>
                             <option value='SOL'>SOL</option>
                         </Select>
@@ -81,7 +94,7 @@ export default function CreateLimitedItemForm(props) {
                 </ModalBody>
                 <ModalFooter>
                     <Button colorScheme='green' mr={3} onClick={saveHandler} isDisabled={!canSave}>Save</Button>
-                    <Button onClick={props.onClose}>Cancel</Button>
+                    <Button onClick={onClose}>Cancel</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
