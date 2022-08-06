@@ -7,7 +7,7 @@ import Image from 'next/image'
 export default function Dashboard() {
     const { wallet, disconnect, publicKey } = useWallet();
 
-    let [tab, setTab] = useState('charts');
+    let [tab, setTab] = useState('limited-items');
 
     
     const menuItems = [
