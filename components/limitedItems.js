@@ -52,28 +52,22 @@ export default function LimitedItems() {
     const itemsList = state.serverData.limited_items;
 
     const onDataSave = async data => {
-        console.log("+++ saving");
-
         onClose();
         onProgressOpen();
 
         const newItem = {
             ...data,
-            mint: Keypair.generate().publicKey.toString(),
+            mint: null,
             sales: 0,
             soldPercent: 0,
             active: false
         };
 
-        console.log("ADDING NEW LIMITED");
-        await actions.addNewLimitedItem(state.publicKey, newItem);
-        console.log("====ADDED NEW LIMITED");
+        let res = await actions.addNewLimitedItem(state.publicKey, newItem);
 
-        
+        onProgressClose();
 
-        setTimeout(() => {
-            onProgressClose();
-
+        if (res) {
             toast({
                 title: 'Data saved',
                 status: 'success',
@@ -81,7 +75,16 @@ export default function LimitedItems() {
                 isClosable: false,
                 position: 'top'
             });
-        }, 3000);
+        } else {
+            toast({
+                title: 'Failed to save data',
+                status: 'error',
+                duration: 2000,
+                isClosable: false,
+                position: 'top'
+            });
+        }
+        
     };
 
     

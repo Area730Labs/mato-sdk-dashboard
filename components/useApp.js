@@ -1,7 +1,25 @@
 import { createContext, useContext, useMemo, useState, useReducer, useEffect } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import useSWR from 'swr'
 import axios from 'axios';
+import {
+    Keypair, 
+    Signer, 
+    Transaction, 
+    SystemProgram,
+    sendAndConfirmTransaction,
+    Connection,
+    Blockhash
+} from '@solana/web3.js';
+import {
+    TOKEN_PROGRAM_ID, 
+    Token, 
+    getMinimumBalanceForRentExemptMint, 
+    MINT_SIZE, 
+    createInitializeMintInstruction
+} from '@solana/spl-token';
+
+
 
 // const API_URL = 'http://127.0.0.1:8000/'
 const API_URL = 'https://dev-api.soltracker.io/';
@@ -17,6 +35,8 @@ const DEFAULT_STATE = {
 };
 
 
+
+
 export const AppContext = createContext({state: {}, dispatch: () => {}, actions: {}});
 
 export function useAppState() {
@@ -25,7 +45,8 @@ export function useAppState() {
 
 export function AppStateProvider({children}) {
     const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
-    const {publicKey} = useWallet(); 
+    const {publicKey, wallet, sendTransaction, signMessage, signTransaction} = useWallet(); 
+    // const { connection } = useConnection();
 
     const fetchAppState = async (pubkey) => {
         try {
@@ -39,13 +60,44 @@ export function AppStateProvider({children}) {
 
     const addNewLimitedItemAction = async (pubkey, newItem) => {
         try {
+            const keypair = Keypair.generate();
+            newItem.mint = keypair.publicKey.toString();
+
+            const connection = new Connection("https://api.mainnet-beta.solana.com");
+            const lamports = await getMinimumBalanceForRentExemptMint(connection);
+            const blockhash = (await connection.getLatestBlockhash()).blockhash;
+
+            let ix_1 = SystemProgram.createAccount({
+                fromPubkey: publicKey,
+                newAccountPubkey: keypair.publicKey,
+                space: MINT_SIZE,
+                lamports: lamports,
+                programId: TOKEN_PROGRAM_ID,
+            });
+
+
+            const transaction = new Transaction().add(
+                ix_1,
+                createInitializeMintInstruction(keypair.publicKey, 6, publicKey, null, TOKEN_PROGRAM_ID)
+            );
+
+            transaction.recentBlockhash = blockhash;
+            transaction.feePayer = publicKey;
+            transaction.sign(keypair);
+
+
+            const sig = await sendTransaction(transaction, connection);
+
             const { data } = await axios.post('mato_add_limited_item', {pubkey: pubkey, item: newItem});
             const items = state.serverData.limited_items.concat(newItem);
 
             dispatch({ type: 'limited_item_added', payload: { items: items} });
+
+            return true;
         } catch (error) {
             if (error.cancelled) return;
             console.error(error);
+            return false;
         }
     };
 
