@@ -1,6 +1,6 @@
-import { useWallet } from "@solana/wallet-adapter-react";
 import Login from '../components/login';
 import Dashboard from '../components/dashboard';
+import { useAppState } from "../components/useApp";
 
 
 function PageWrapper({ children }) {
@@ -10,10 +10,9 @@ function PageWrapper({ children }) {
 }
 
 export default function Home() {
-  const { publicKey } = useWallet();
+  const { isLoggedIn } = useAppState().state;
 
-  return (
-    publicKey != null ? <PageWrapper>
+  return (isLoggedIn ? <PageWrapper>
       <Dashboard />
     </PageWrapper> : <Login />
   )

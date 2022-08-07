@@ -1,7 +1,30 @@
 import React from "react";
 import Chart from "chart.js";
+import { 
+  SimpleGrid,
+  Box,
+  Divider,
+  VStack,
+  StackDivider,
+  HStack,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  StatArrow,
+  Text,
+  StatGroup,
+} from '@chakra-ui/react'
+import Image from 'next/image'
+import { useWallet } from '@solana/wallet-adapter-react';
+
+
+
 
 export default function Charts() {
+    const { publicKey } = useWallet();
+
+
     React.useEffect(() => {
         var config = {
           type: "line",
@@ -112,7 +135,50 @@ export default function Charts() {
 
     return (
         <>
-            <p class="not-italic text-center text-xl font-bold m-2.5 mt-4">Game stats</p>
+            <p className="not-italic text-center text-xl font-bold m-2.5 mt-4">Game stats</p>
+
+            <VStack
+              divider={<StackDivider borderColor='gray.200' />}
+              spacing={4}
+              align='stretch'
+              padding={5}
+            >
+              <HStack>
+                <a href="#">
+                  <Image src="/copyIcon.svg" alt="Logo" className="mr-3 h-6 sm:h-7" width={22} height={22} color='gray.100'/>
+                </a>
+                <Text fontSize='s' fontWeight='bold'>Project ID:</Text>
+                <Text fontSize='s'>{publicKey.toString()}</Text>
+              </HStack>
+
+
+              <SimpleGrid columns={2} spacingX='40px' spacingY='20px'>
+                <Box border='1px' borderColor='gray.100' padding={4} borderRadius={11} >
+                  <Stat>
+                    <StatLabel>Revenue (all time)</StatLabel>
+                    <StatNumber>USDC 345,670</StatNumber>
+                    <StatHelpText>Per user: USDC 155</StatHelpText>
+                  </Stat>
+                </Box>
+
+                <Box border='1px' borderColor='gray.100' padding={4} borderRadius={11}>
+                  <Stat>
+                    <StatLabel>Revenue (last 30 days)</StatLabel>
+                    <StatNumber>USDC 15,990</StatNumber>
+                    <StatHelpText>
+                      <StatArrow type='increase' />
+                      23.36%
+                    </StatHelpText>
+                  </Stat>
+                </Box>
+
+               
+                
+              </SimpleGrid>
+
+              
+            </VStack>
+
 
             <div className="relative flex flex-col  break-words m-4 border-b border-gray-200 bg-blueGray-700 p-2">
                 <div className="rounded-t mb-0 px-4 py-3 bg-transparent">

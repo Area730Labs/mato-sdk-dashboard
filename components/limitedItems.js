@@ -1,72 +1,138 @@
+import { 
+    Button, 
+    ButtonGroup ,
+    Flex,
+    Spacer,
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption,
+    TableContainer,
+    Switch,
+    CircularProgress,
+    CircularProgressLabel,
+    useToast,
+} from '@chakra-ui/react'
+import { useDisclosure } from '@chakra-ui/react'
+import CreateLimitedItemForm from './createLimitedItemForm';
+import ProgressDialog from './progressDialog';
+import LimitedRowItem from './limitedItemRow'
+import { useState } from 'react';
+import {Keypair} from '@solana/web3.js' 
+import { useAppState } from './useApp';
 
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
 
 export default function LimitedItems() {
-    return (<>
-        <p class="not-italic text-center text-xl font-bold m-2.5 mt-4">Limited items</p>
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const toast = useToast();
+    const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
 
-        <table className="text-sm text-left text-gray-500 dark:text-gray-400 m-2 mt-4">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th scope="col" className="py-3 px-6">
-                            Item name
-                        </th>
-                        <th scope="col" className="py-3 px-6">
-                            Game uid
-                        </th>
-                        <th scope="col" className="py-3 px-6">
-                            Supply
-                        </th>
-                        <th scope="col" className="py-3 px-6">
-                            Price
-                        </th>
-                        <th scope="col" className="py-3 px-6">
-                            Mint
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                        <th scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            Golden dragon mount
-                        </th>
-                        <td className="py-4 px-6">
-                            golden-dragon
-                        </td>
-                        <td className="py-4 px-6">
-                            1000
-                        </td>
-                        <td className="py-4 px-6">
-                            USDC 140
-                        </td>
-                        <td className="py-4 px-6">
-                        EPjFWdd5Aufq...
-                        <a href="#">
-                        <svg class="w-6 h-6 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
-                        </a>
-                        </td>
-                    </tr>
-                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                        <th scope="row" className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            Korgi pet
-                        </th>
-                        <td className="py-4 px-6">
-                            pet-korgi
-                        </td>
-                        <td className="py-4 px-6">
-                            500
-                        </td>
-                        <td className="py-4 px-6">
-                            USDC 320
-                        </td>
-                        <td className="py-4 px-6">
-                        EPjFWdd5Aufq...
-                        <a href="#">
-                        <svg class="w-6 h-6 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
-                        </a>
-                        </td>
-                    </tr>
-                    
-                </tbody>
-            </table>
+    const { state, dispatch, actions } = useAppState();
+
+    const showCopyOkToast = () => {
+        if (!toast.isActive('copy-info')) {
+            toast({
+                title: 'Copied mint to clipboard',
+                status: 'info',
+                duration: 3000,
+                isClosable: false,
+                position: 'top',
+                id: 'copy-info'
+            });
+        }
+    };
+
+    const itemsList = state.serverData.limited_items;
+
+    const onDataSave = async data => {
+        onClose();
+        onProgressOpen();
+
+        const newItem = {
+            ...data,
+            mint: null,
+            sales: 0,
+            soldPercent: 0,
+            active: false
+        };
+
+        let res = await actions.addNewLimitedItem(state.publicKey, newItem);
+
+        onProgressClose();
+
+        if (res) {
+            toast({
+                title: 'Data saved',
+                status: 'success',
+                duration: 2000,
+                isClosable: false,
+                position: 'top'
+            });
+        } else {
+            toast({
+                title: 'Failed to save data',
+                status: 'error',
+                duration: 2000,
+                isClosable: false,
+                position: 'top'
+            });
+        }
+        
+    };
+
+    
+    const onActivateItemHandler = e => {
+        // const mint = e.target.name;
+        // let index = items.findIndex(a => a.mint === mint);
+        
+        // let newItems = [...items];
+        // let item = {...newItems[index]};
+        // item.active = !item.active;
+        // newItems[index] = item;
+        
+        // setItems(newItems);
+    }
+
+
+    return (<>
+        <Flex w="100%" p="1rem" borderBottom='1px' borderColor='gray.200'>
+            <p className="not-italic text-xl font-bold pl-2">Limited items</p>
+            <Spacer />
+            <Button colorScheme='teal' size='sm' onClick={onOpen}>
+                Add new
+            </Button>
+        </Flex>
+
+        <CreateLimitedItemForm isOpen={isOpen} onClose={onClose} onSave={onDataSave} />
+        <ProgressDialog isOpen={isProgressOpen} />
+
+        <TableContainer>
+            <Table variant='striped' >
+                <TableCaption>List of limited items in shop</TableCaption>
+                <Thead>
+                    <Tr>
+                        {/* <Th textAlign='center' width='0em'>Enabled</Th> */}
+                        <Th>Name</Th>
+                        <Th>Game UID</Th>
+                        <Th>Mint</Th>
+                        <Th isNumeric>Supply</Th>
+                        <Th isNumeric>Price</Th>
+                        <Th isNumeric>Sales</Th>
+                        <Th textAlign='end'>Sold</Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
+                    {itemsList.map((item) => (<LimitedRowItem key={item.mint} {...item} showCopyOkToast={showCopyOkToast} enableHandler={onActivateItemHandler} />))}
+                </Tbody>
+               
+            </Table>    
+        </TableContainer>
     </>);
 }
