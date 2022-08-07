@@ -66,7 +66,7 @@ export default function LimitedItems() {
         };
 
         console.log("ADDING NEW LIMITED");
-        await actions.addNewLimitedItem(state.publicKey, newItem)(dispatch);
+        await actions.addNewLimitedItem(state.publicKey, newItem);
         console.log("====ADDED NEW LIMITED");
 
         

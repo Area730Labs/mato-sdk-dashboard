@@ -30,11 +30,22 @@ export function AppStateProvider({children}) {
     const fetchAppState = async (pubkey) => {
         try {
           const { data } = await axios.get('get_mato_config/' + pubkey.toString());
-  
           dispatch({ type: 'app_data_updated', payload: { data } });
         } catch (error) {
           if (error.cancelled) return;
           console.error(error);
+        }
+    };
+
+    const addNewLimitedItemAction = async (pubkey, newItem) => {
+        try {
+            const { data } = await axios.post('mato_add_limited_item', {pubkey: pubkey, item: newItem});
+            const items = state.serverData.limited_items.concat(newItem);
+
+            dispatch({ type: 'limited_item_added', payload: { items: items} });
+        } catch (error) {
+            if (error.cancelled) return;
+            console.error(error);
         }
     };
 
@@ -46,7 +57,9 @@ export function AppStateProvider({children}) {
         }
     }, [publicKey]);
 
-    const value = {state: state, dispatch: dispatch, actions: actions}
+    const value = {state: state, dispatch: dispatch, actions: {
+        addNewLimitedItem: addNewLimitedItemAction
+    }}
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }
@@ -55,8 +68,6 @@ export function AppStateProvider({children}) {
 function reducer(state = DEFAULT_STATE, action) {
     switch (action.type) {
         case 'logOut':
-        console.log('logOut');
-
             return {
                 ...state,
                 publicKey: null,
@@ -64,14 +75,12 @@ function reducer(state = DEFAULT_STATE, action) {
                 isLoggedIn: false,
             };
         case 'app_data_updated':
-        console.log('app_data_updated');
-
-                const data = action.payload.data;
-                return {
-                    ...state,
-                    serverData: data,
-                    isLoggedIn: state.publicKey != null && data != null
-                };
+            const data = action.payload.data;
+            return {
+                ...state,
+                serverData: data,
+                isLoggedIn: state.publicKey != null && data != null
+            };
         case 'update_pubkey':
             const pk = action.payload;
 
@@ -81,45 +90,14 @@ function reducer(state = DEFAULT_STATE, action) {
                 isLoggedIn: pk != null && state.serverData != null
             };
 
-    case 'limited_item_added':
-        console.log('Action: limited_item_added');
-        const newItem = action.payload;
+        case 'limited_item_added':
+            const items = action.payload.items;
 
-        let s1 = {
-            ...state,
-        };
+            let s1 = {...state,};
+            s1.serverData.limited_items = items;
 
-        s1.serverData.limited_items.push(newItem);
-
-        return s1;
+            return s1;
       default:
         throw new Error();
     }
 }
-
-
-const actions = {
-    fetchAppState: async (pubkey) => async (dispatch) => {
-      try {
-        const { data } = await axios.get('get_mato_config/' + pubkey.toString());
-
-        dispatch({ type: 'app_data_updated', payload: { data } });
-      } catch (error) {
-        if (error.cancelled) return;
-        console.error(error);
-      }
-    },
-    addNewLimitedItem: (pubkey, newItem) => async (dispatch) => {
-        console.log("start: addNewLimitedItem: " + pubkey + ", - " + newItem);
-        try {
-            const { data } = await axios.post('mato_add_limited_item', {pubkey: pubkey, item: newItem});
-            
-            console.log("1111");
-            dispatch({ type: 'limited_item_added', payload: { newItem } });
-            console.log("2222");
-        } catch (error) {
-            if (error.cancelled) return;
-            console.error(error);
-        }
-      },
-};
