@@ -88,7 +88,7 @@ export default function CreateLimitedItemForm(props) {
                         </Select>
 
 
-                        <FormHelperText>Please doublecheck everything as you won't be able to change it later, only create a new one</FormHelperText>
+                        <FormHelperText>Please doublecheck everything as you will not be able to change it later, only create a new one</FormHelperText>
                     </FormControl>
 
                 </ModalBody>

@@ -23,6 +23,7 @@ import ProgressDialog from './progressDialog';
 import LimitedRowItem from './limitedItemRow'
 import { useState } from 'react';
 import {Keypair} from '@solana/web3.js' 
+import { useAppState } from './useApp';
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -32,6 +33,8 @@ export default function LimitedItems() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const toast = useToast();
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
+
+    const { state, dispatch, actions } = useAppState();
 
     const showCopyOkToast = () => {
         if (!toast.isActive('copy-info')) {
@@ -46,37 +49,30 @@ export default function LimitedItems() {
         }
     };
 
-    let [items, setItems] = useState([
-        {
-            itemName: 'Golden drsgon',
-            gameUid: 'golden-drsgon',
-            mint: '6dlkdjf8doufdifldjflkjdlfkjdlkfjdlkf',
-            supply: 10000,
-            price: 105,
-            sales: 143900,
-            tokenSymbol: 'USDC',
-            soldPercent: 43,
-            active: false
-        }
-    ]);
+    const itemsList = state.serverData.limited_items;
 
-    const onDataSave = data => {
+    const onDataSave = async data => {
+        console.log("+++ saving");
+
         onClose();
         onProgressOpen();
 
+        const newItem = {
+            ...data,
+            mint: Keypair.generate().publicKey.toString(),
+            sales: 0,
+            soldPercent: 0,
+            active: false
+        };
+
+        console.log("ADDING NEW LIMITED");
+        await actions.addNewLimitedItem(state.publicKey, newItem)(dispatch);
+        console.log("====ADDED NEW LIMITED");
+
+        
+
         setTimeout(() => {
             onProgressClose();
-
-            setItems(prevItems => [
-                ...prevItems,
-                {
-                    ...data,
-                    mint: Keypair.generate().publicKey.toString(),
-                    sales: getRandomInt(500),
-                    soldPercent: getRandomInt(100),
-                    active: false
-                }
-            ]);
 
             toast({
                 title: 'Data saved',
@@ -90,16 +86,17 @@ export default function LimitedItems() {
 
     
     const onActivateItemHandler = e => {
-        const mint = e.target.name;
-        let index = items.findIndex(a => a.mint === mint);
+        // const mint = e.target.name;
+        // let index = items.findIndex(a => a.mint === mint);
         
-        let newItems = [...items];
-        let item = {...newItems[index]};
-        item.active = !item.active;
-        newItems[index] = item;
+        // let newItems = [...items];
+        // let item = {...newItems[index]};
+        // item.active = !item.active;
+        // newItems[index] = item;
         
-        setItems(newItems);
+        // setItems(newItems);
     }
+
 
     return (<>
         <Flex w="100%" p="1rem" borderBottom='1px' borderColor='gray.200'>
@@ -118,7 +115,7 @@ export default function LimitedItems() {
                 <TableCaption>List of limited items in shop</TableCaption>
                 <Thead>
                     <Tr>
-                        <Th textAlign='center' width='0em'>Enabled</Th>
+                        {/* <Th textAlign='center' width='0em'>Enabled</Th> */}
                         <Th>Name</Th>
                         <Th>Game UID</Th>
                         <Th>Mint</Th>
@@ -129,7 +126,7 @@ export default function LimitedItems() {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {items.map((item) => (<LimitedRowItem key={item.mint} {...item} showCopyOkToast={showCopyOkToast} enableHandler={onActivateItemHandler} />))}
+                    {itemsList.map((item) => (<LimitedRowItem key={item.mint} {...item} showCopyOkToast={showCopyOkToast} enableHandler={onActivateItemHandler} />))}
                 </Tbody>
                
             </Table>    

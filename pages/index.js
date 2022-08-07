@@ -1,11 +1,11 @@
-import { useWallet } from "@solana/wallet-adapter-react";
 import Login from '../components/login';
 import Dashboard from '../components/dashboard';
+import { useAppState } from "../components/useApp";
 
 export default function Home() {
-  const { publicKey } = useWallet();
+  const { isLoggedIn } = useAppState().state;
 
   return (
-    publicKey != null ? <Dashboard /> : <Login/>
+    isLoggedIn ? <Dashboard /> : <Login/>
   )
 }
