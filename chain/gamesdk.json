@@ -1,0 +1,277 @@
+{
+    "version": "0.1.0",
+    "name": "gamesdk",
+    "instructions": [
+      {
+        "name": "buyGameItem",
+        "accounts": [
+          {
+            "name": "signer",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "project",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "walletAuthority",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "mint",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "buyerTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "escrowTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "mintMeta",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "items",
+            "type": "u64"
+          }
+        ]
+      },
+      {
+        "name": "createGameProject",
+        "accounts": [
+          {
+            "name": "uid",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "signer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "authority",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "project",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "escrow",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "rentProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "projectBump",
+            "type": "u8"
+          },
+          {
+            "name": "escrowBump",
+            "type": "u8"
+          }
+        ]
+      },
+      {
+        "name": "createItem",
+        "accounts": [
+          {
+            "name": "project",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "meta",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "metaAlias",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "mint",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "priceMint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "rentProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "maxItems",
+            "type": "u64"
+          },
+          {
+            "name": "maxPerUser",
+            "type": "u64"
+          },
+          {
+            "name": "pricePerItem",
+            "type": "u64"
+          },
+          {
+            "name": "itemId",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "resourceUrl",
+            "type": {
+              "array": [
+                "u32",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "accounts": [
+      {
+        "name": "SdkItemAlias",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "mint",
+              "type": "publicKey"
+            }
+          ]
+        }
+      },
+      {
+        "name": "SdkItemMeta",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "maxItems",
+              "type": "u64"
+            },
+            {
+              "name": "itemsCount",
+              "type": "u64"
+            },
+            {
+              "name": "maxPerUser",
+              "type": "u64"
+            },
+            {
+              "name": "itemId",
+              "type": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            },
+            {
+              "name": "resourceUrl",
+              "type": {
+                "array": [
+                  "u32",
+                  32
+                ]
+              }
+            },
+            {
+              "name": "price",
+              "type": "u64"
+            },
+            {
+              "name": "priceMint",
+              "type": "publicKey"
+            }
+          ]
+        }
+      },
+      {
+        "name": "SdkProject",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": "publicKey"
+            },
+            {
+              "name": "escrow",
+              "type": "publicKey"
+            },
+            {
+              "name": "uid",
+              "type": "publicKey"
+            },
+            {
+              "name": "bump",
+              "type": "u8"
+            },
+            {
+              "name": "escrowBump",
+              "type": "u8"
+            }
+          ]
+        }
+      }
+    ]
+  }

@@ -21,11 +21,13 @@ import { useDisclosure } from '@chakra-ui/react'
 import CreateLimitedItemForm from './createLimitedItemForm';
 import ProgressDialog from './progressDialog';
 import LimitedRowItem from './limitedItemRow'
-import { useState } from 'react';
-import {Keypair} from '@solana/web3.js' 
 import { useAppState } from './useApp';
+import  * as anchor from '@project-serum/anchor';
+import { PublicKey } from '@solana/web3.js';
+import BN from "bn.js"
+import ChainSdk from '../chain/sdk';
 
-function getRandomInt(max) {
+function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
 }
 
@@ -62,6 +64,8 @@ export default function LimitedItems() {
             soldPercent: 0,
             active: false
         };
+
+        ChainSdk.createProject(new BN(100),new BN(1),new BN(100),"ssd","sss");
 
         let res = await actions.addNewLimitedItem(state.publicKey, newItem);
 

@@ -22,89 +22,15 @@ import React, { useState } from "react";
 import Label from "./core/label";
 import { WarningIcon } from '@chakra-ui/icons'
 
-function SupplySlider(props) {
-
-    const [sliderValue, setSliderValue] = useState(reversevalue(props.value))
-    const [maxVal, setMax] = useState(500);
-
-    console.log('slider redraw with value',props.value,sliderValue);
-
-    const labelStyles = {
-        mt: '2',
-        ml: '-2.5',
-        fontSize: 'sm',
-    }
-
-    function value(expval) {
-        return Math.round(Math.exp((expval / maxVal) * 13))
-    }
-
-    function reversevalue(val) {
-        for (let i = 0; i < maxVal; i++) {
-            if (value(i) > val) {
-                return i;
-            }
-        }
-
-        return 500;
-    }
-
-    return (
-        <Box pt={6} pb={2}>
-            <Slider
-                aria-label='slider-ex-6'
-                onChange={(val) => {
-                    setSliderValue(val)
-                    props.changeHandler(value(val))
-                }}
-                max={maxVal}
-                value={sliderValue}
-            >
-                <SliderMark value={177} {...labelStyles}>
-                    {value(177)}
-                </SliderMark>
-                <SliderMark value={239} {...labelStyles}>
-                    {value(239)}
-                </SliderMark>
-                <SliderMark value={355} {...labelStyles}>
-                    10000
-                </SliderMark>
-                <SliderMark value={470} {...labelStyles}>
-                    400000
-                </SliderMark>
-
-                <SliderMark
-                    value={sliderValue}
-                    textAlign='center'
-                    bg='tomato'
-                    color='white'
-                    mt='-10'
-                    ml='-5'
-                    paddingX="6px"
-                >
-                    {value(sliderValue)}
-                </SliderMark>
-
-                <SliderTrack bg='red.100'>
-                    <SliderFilledTrack bg='tomato' />
-                </SliderTrack>
-
-                <SliderThumb />
-            </Slider>
-        </Box>
-    )
-}
-
 export default function CreateLimitedItemForm(props) {
 
     const [formValues, setFormValues] = useState({
         // itemName: '',
         gameUid: '',
         price: 0,
-        tokenSymbol: ''
+        tokenSymbol: '',
+        supply: 0,
     });
-
-    const [supply,setSupply] = useState(10000);
 
     const changeHandler = e => {
         setFormValues({ ...formValues, [e.target.name]: e.target.value })
@@ -116,7 +42,7 @@ export default function CreateLimitedItemForm(props) {
 
     const canSave = //formValues.itemName.length > 0 && 
         formValues.gameUid.length > 0
-        && supply > 0
+        && formValues.supply > 0
         && formValues.tokenSymbol.length > 0;
 
     const onClose = () => {
@@ -126,10 +52,9 @@ export default function CreateLimitedItemForm(props) {
             // itemName: '',
             gameUid: '',
             price: 0,
+            supply: 0,
             tokenSymbol: ''
         });
-
-        setSupply(10000);
     };
 
     return (
@@ -169,9 +94,9 @@ export default function CreateLimitedItemForm(props) {
 
                         <NumberInput>
                                 <NumberInputField
-                                    value={formValues.price}
+                                    value={formValues.supply}
                                     onChange={changeHandler}
-                                    name='price'
+                                    name='supply'
                                     placeholder='10000'
                                 />
                         </NumberInput>
