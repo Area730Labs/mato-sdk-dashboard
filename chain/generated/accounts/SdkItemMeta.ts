@@ -1,6 +1,7 @@
 import { PublicKey, Connection } from "@solana/web3.js"
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
 export interface SdkItemMetaFields {
@@ -8,7 +9,6 @@ export interface SdkItemMetaFields {
   itemsCount: BN
   maxPerUser: BN
   itemId: Array<number>
-  resourceUrl: Array<number>
   price: BN
   priceMint: PublicKey
 }
@@ -18,7 +18,6 @@ export interface SdkItemMetaJSON {
   itemsCount: string
   maxPerUser: string
   itemId: Array<number>
-  resourceUrl: Array<number>
   price: string
   priceMint: string
 }
@@ -28,7 +27,6 @@ export class SdkItemMeta {
   readonly itemsCount: BN
   readonly maxPerUser: BN
   readonly itemId: Array<number>
-  readonly resourceUrl: Array<number>
   readonly price: BN
   readonly priceMint: PublicKey
 
@@ -41,7 +39,6 @@ export class SdkItemMeta {
     borsh.u64("itemsCount"),
     borsh.u64("maxPerUser"),
     borsh.array(borsh.u8(), 32, "itemId"),
-    borsh.array(borsh.u32(), 32, "resourceUrl"),
     borsh.u64("price"),
     borsh.publicKey("priceMint"),
   ])
@@ -51,7 +48,6 @@ export class SdkItemMeta {
     this.itemsCount = fields.itemsCount
     this.maxPerUser = fields.maxPerUser
     this.itemId = fields.itemId
-    this.resourceUrl = fields.resourceUrl
     this.price = fields.price
     this.priceMint = fields.priceMint
   }
@@ -102,7 +98,6 @@ export class SdkItemMeta {
       itemsCount: dec.itemsCount,
       maxPerUser: dec.maxPerUser,
       itemId: dec.itemId,
-      resourceUrl: dec.resourceUrl,
       price: dec.price,
       priceMint: dec.priceMint,
     })
@@ -114,7 +109,6 @@ export class SdkItemMeta {
       itemsCount: this.itemsCount.toString(),
       maxPerUser: this.maxPerUser.toString(),
       itemId: this.itemId,
-      resourceUrl: this.resourceUrl,
       price: this.price.toString(),
       priceMint: this.priceMint.toString(),
     }
@@ -126,7 +120,6 @@ export class SdkItemMeta {
       itemsCount: new BN(obj.itemsCount),
       maxPerUser: new BN(obj.maxPerUser),
       itemId: obj.itemId,
-      resourceUrl: obj.resourceUrl,
       price: new BN(obj.price),
       priceMint: new PublicKey(obj.priceMint),
     })

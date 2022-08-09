@@ -21,14 +21,25 @@ import React, { useState } from "react";
 
 import Label from "./core/label";
 import { WarningIcon } from '@chakra-ui/icons'
+import { PublicKey } from '@solana/web3.js';
+
+export interface CreateItemForm{
+    price: number,
+    payment_mint: PublicKey,
+    supply: number,
+    game_uid: string,
+};
+
+export const USDC_TOKEN = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+export const SOL_TOKEN = new PublicKey("So11111111111111111111111111111111111111112");
 
 export default function CreateLimitedItemForm(props) {
 
-    const [formValues, setFormValues] = useState({
+    const [formValues, setFormValues] = useState<CreateItemForm>({
         // itemName: '',
-        gameUid: '',
+        game_uid: '',
         price: 0,
-        tokenSymbol: '',
+        payment_mint: USDC_TOKEN,
         supply: 0,
     });
 
@@ -41,24 +52,23 @@ export default function CreateLimitedItemForm(props) {
     }
 
     const canSave = //formValues.itemName.length > 0 && 
-        formValues.gameUid.length > 0
+        formValues.game_uid.length > 0
         && formValues.supply > 0
-        && formValues.tokenSymbol.length > 0;
 
     const onClose = () => {
         props.onClose();
 
-        setFormValues({
-            // itemName: '',
-            gameUid: '',
-            price: 0,
-            supply: 0,
-            tokenSymbol: ''
-        });
+        // setFormValues({
+        //     // itemName: '',
+        //     gameUid: '',
+        //     price: 0,
+        //     supply: 0,
+        //     tokenSymbol: ''
+        // });
     };
 
     return (
-        <Modal onClose={onClose} isOpen={props.isOpen} isCentered closeOnOverlayClick={false}>
+        <Modal onClose={onClose} isOpen={props.isOpen} isCentered>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
@@ -81,9 +91,9 @@ export default function CreateLimitedItemForm(props) {
                             <Label>Game uid</Label>
                         </FormLabel>
                         <Input
-                            value={formValues.gameUid}
+                            value={formValues.game_uid}
                             onChange={changeHandler}
-                            name='gameUid'
+                            name='game_uid'
                             autoComplete="off"
                             placeholder='some_item'
                         />
@@ -118,8 +128,8 @@ export default function CreateLimitedItemForm(props) {
                                 />
                                 <GridItem colSpan={3}>
                                     <Select placeholder={<Label>Payment token</Label>} value={formValues.tokenSymbol} onChange={changeHandler} name='tokenSymbol'>
-                                        <option value='USDC'><Label>USDC</Label></option>
-                                        <option value='SOL'><Label>SOL</Label></option>
+                                        <option value={USDC_TOKEN}><Label>USDC</Label></option>
+                                        <option value={SOL_TOKEN}><Label>SOL</Label></option>
                                     </Select>
                                 </GridItem>
                             </Grid>

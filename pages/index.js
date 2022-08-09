@@ -1,19 +1,26 @@
 import Login from '../components/login';
 import Dashboard from '../components/dashboard';
-import { useAppState } from "../components/useApp";
+import { AppProvider } from "../core/appcontext";
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useAppState } from '../components/useApp';
 
 
 function PageWrapper({ children }) {
-  return <div class="container w-4/5 mx-auto">
-    {children ?? null}
-  </div>
+
+  let {wallet} = useWallet();
+
+  return <AppProvider wallet={wallet.adapter}>
+    <div class="container w-4/5 mx-auto">
+      {children ?? null}
+    </div>
+  </AppProvider>
 }
 
 export default function Home() {
   const { isLoggedIn } = useAppState().state;
 
   return (isLoggedIn ? <PageWrapper>
-      <Dashboard />
-    </PageWrapper> : <Login />
+    <Dashboard />
+  </PageWrapper> : <Login />
   )
 }

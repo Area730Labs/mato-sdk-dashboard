@@ -18,14 +18,15 @@ import {
     useToast,
 } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
-import CreateLimitedItemForm from './createLimitedItemForm';
+import CreateLimitedItemForm, { CreateItemForm } from './createLimitedItemForm';
 import ProgressDialog from './progressDialog';
 import LimitedRowItem from './limitedItemRow'
 import { useAppState } from './useApp';
-import  * as anchor from '@project-serum/anchor';
-import { PublicKey } from '@solana/web3.js';
-import BN from "bn.js"
 import ChainSdk from '../chain/sdk';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useAppContext } from '../core/appcontext';
+import { Keypair, PublicKey, Signer } from '@solana/web3.js';
+import { SdkProject } from '../chain/generated/accounts';
 
 function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
@@ -37,6 +38,8 @@ export default function LimitedItems() {
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
 
     const { state, dispatch, actions } = useAppState();
+    const {wallet} = useWallet();
+    const {sendTx,connection} = useAppContext();
 
     const showCopyOkToast = () => {
         if (!toast.isActive('copy-info')) {
@@ -53,41 +56,71 @@ export default function LimitedItems() {
 
     const itemsList = state.serverData.limited_items;
 
-    const onDataSave = async data => {
+    const onDataSave = async (data : CreateItemForm) => {
         onClose();
         onProgressOpen();
 
+        const project_id = new PublicKey("b5XHK9Hfcfp9QJ3kowao8N3D9mEQs5FrUL4zhP6pmfi");
+        const mint_keypair = new Keypair();
+
+        const project_info = await SdkProject.fetch(connection,project_id);
+
+        const ix = new ChainSdk(wallet.adapter).createItem(
+            project_id,
+            project_info,
+            mint_keypair.publicKey,
+            data.supply,
+            data.price,
+            data.payment_mint,
+            data.game_uid,
+            "https://arweave.net/K_0cZoEK8wa8_rnlN0Tnwp1DEQfJjffg5dwMi9B7mTU?ext=png"
+        );
+
         const newItem = {
             ...data,
-            mint: null,
+            mint: mint_keypair.publicKey,
             sales: 0,
             soldPercent: 0,
             active: false
         };
 
-        ChainSdk.createProject(new BN(100),new BN(1),new BN(100),"ssd","sss");
+        console.log('item ',ix);
+        console.log("extra signer for this tx : ",mint_keypair.publicKey.toString());
 
-        let res = await actions.addNewLimitedItem(state.publicKey, newItem);
+        const signers = [
+            {
+                publicKey: mint_keypair.publicKey, 
+                secretKey: mint_keypair.secretKey
+            } as Signer,
+        ];
+        
+        sendTx([ix],"other", signers).then(() => {
+            console.log('tx sent')
+        }).catch((e) => {
+            console.error('got an error: ',e)
+        });
+
+        // let res = await actions.addNewLimitedItem(state.publicKey, newItem);
 
         onProgressClose();
 
-        if (res) {
-            toast({
-                title: 'Data saved',
-                status: 'success',
-                duration: 2000,
-                isClosable: false,
-                position: 'top'
-            });
-        } else {
-            toast({
-                title: 'Failed to save data',
-                status: 'error',
-                duration: 2000,
-                isClosable: false,
-                position: 'top'
-            });
-        }
+        // if (res) {
+        //     toast({
+        //         title: 'Data saved',
+        //         status: 'success',
+        //         duration: 2000,
+        //         isClosable: false,
+        //         position: 'top'
+        //     });
+        // } else {
+        //     toast({
+        //         title: 'Failed to save data',
+        //         status: 'error',
+        //         duration: 2000,
+        //         isClosable: false,
+        //         position: 'top'
+        //     });
+        // }
         
     };
 

@@ -23,6 +23,7 @@ export interface AppContextType {
 
     // lang: Lang,
     // setLang: { (value: Lang) }
+    connection: web3.Connection
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -31,11 +32,11 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function AppProvider({ children }: { children: ReactNode; }) {
+export function AppProvider({ children,wallet }: { children: ReactNode, wallet: WalletAdapter }) {
 
     // const [lang, setLang] = useState<Lang>(getLanguageFromCache());
     const [solanaNode, setSolanaNode] = useState<string>(global_config.cluster_url)
-    const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);
+    const [connectedWallet, setWallet] = useState<WalletAdapter>(wallet);
 
     const [curtx, setCurtx] = useState<CurrentTx | null>(null);
     const [userUpdatesCounter, setUserUpdatesCounter] = useState(0);
@@ -246,9 +247,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         if (global_config.debug_simulate_tx) {
             toast.warn("simulation of tx enabled. look into console for more info")
             txhandler.simulate(ixs, signers);
-
             return Promise.reject(new Error("simulation enabled, look into console"));
-
         } else {
             return txhandler.sendTransaction(ixs, signers).then((signature) => {
 
@@ -267,7 +266,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     }
 
     const memoedValue = useMemo(() => {
-        const curCtx = {
+        const curCtx:AppContextType = {
 
             // wallet
             solanaConnection: rpc_wrapper,
@@ -281,7 +280,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             // // lang 
             // lang,
             // setLang,
-        } as AppContextType;
+            connection: web3Handler
+        } ;
 
         return curCtx
 

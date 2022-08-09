@@ -15,7 +15,11 @@ class TxHandler {
 
         const hash = await this.connection.getLatestBlockhash();
 
-        const transactionObject = new Transaction({ blockhash: hash.blockhash, lastValidBlockHeight: hash.lastValidBlockHeight, feePayer: this.wallet.publicKey } as TransactionBlockhashCtor);
+        const transactionObject = new Transaction({ 
+            blockhash: hash.blockhash, 
+            lastValidBlockHeight: hash.lastValidBlockHeight, 
+            feePayer: this.wallet.publicKey 
+        } as TransactionBlockhashCtor);
 
         return transactionObject;
     }
@@ -28,9 +32,12 @@ class TxHandler {
             tx.add(txIx);
         }
 
+        console.log(tx.serializeMessage().toString("base64"));
+
         if (signers != null && signers.length > 0) {
             return this.wallet.sendTransaction(tx, this.connection, {
                 signers: signers,
+                skipPreflight : true,
             } as SendTransactionOptions);
         } else {
             return this.wallet.sendTransaction(tx, this.connection);

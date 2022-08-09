@@ -33,7 +33,6 @@ export interface SolanaRpc {
     >;
 
     getMinimumBalanceForRentExemptAccount(): Promise<number>,
-
 }
 
 export enum QueuedRpcRequestType {
@@ -103,7 +102,6 @@ export function createRpcWrapper(args : RpcWrapperContextType): SolanaRpc {
     let {rpcQueue,setRpcQueue,setLastRpcRequestTime} = args;
 
     return {
-
         getAccountInfo(publicKey, commitment?) {
             return this.generate_result_promise(QueuedRpcRequestType.get_account_info, [
                 publicKey,
