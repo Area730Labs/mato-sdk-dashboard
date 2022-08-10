@@ -7,8 +7,10 @@ export type SdkErrorKind =
   | SdkError.PriceError
   | SdkError.AllItemsAreSold
   | SdkError.NotEnoughFunds
+  | SdkError.ObjectIdTooLong
 export type SdkErrorJSON =
   | SdkError.WalletAccountIsWrongJSON
   | SdkError.PriceErrorJSON
   | SdkError.AllItemsAreSoldJSON
   | SdkError.NotEnoughFundsJSON
+  | SdkError.ObjectIdTooLongJSON

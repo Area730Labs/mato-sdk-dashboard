@@ -84,9 +84,6 @@ export default function LimitedItems() {
             active: false
         };
 
-        console.log('item ',ix);
-        console.log("extra signer for this tx : ",mint_keypair.publicKey.toString());
-
         const signers = [
             {
                 publicKey: mint_keypair.publicKey, 

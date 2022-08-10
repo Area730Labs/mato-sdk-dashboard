@@ -37,8 +37,7 @@ class ChainSdk {
             maxItems: new BN(max),
             maxPerUser: new BN(0),
             pricePerItem: new BN(price),
-            // itemId: id_buffer,
-            // resourceUrl: url_buffer
+            itemId: id
         };
 
         const ixAccounts: CreateItemAccounts = {

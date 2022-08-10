@@ -67,6 +67,13 @@ export default function CreateLimitedItemForm(props) {
         // });
     };
 
+    const changePaymentToken = (e) => {
+        let pk = new PublicKey(e.target.value);
+
+        formValues.payment_mint = pk;
+        setFormValues(formValues);
+    }
+
     return (
         <Modal onClose={onClose} isOpen={props.isOpen} isCentered>
             <ModalOverlay />
@@ -127,9 +134,9 @@ export default function CreateLimitedItemForm(props) {
                                     placeholder='50'
                                 />
                                 <GridItem colSpan={3}>
-                                    <Select placeholder={<Label>Payment token</Label>} value={formValues.tokenSymbol} onChange={changeHandler} name='tokenSymbol'>
-                                        <option value={USDC_TOKEN}><Label>USDC</Label></option>
-                                        <option value={SOL_TOKEN}><Label>SOL</Label></option>
+                                    <Select placeholder={<Label>Payment token</Label>} value={formValues.payment_mint} onChange={changePaymentToken}>
+                                        <option value={USDC_TOKEN.toString()}><Label>USDC</Label></option>
+                                        <option value={SOL_TOKEN.toString()}><Label>SOL</Label></option>
                                     </Select>
                                 </GridItem>
                             </Grid>

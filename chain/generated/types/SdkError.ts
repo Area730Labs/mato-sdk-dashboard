@@ -87,6 +87,27 @@ export class NotEnoughFunds {
   }
 }
 
+export interface ObjectIdTooLongJSON {
+  kind: "ObjectIdTooLong"
+}
+
+export class ObjectIdTooLong {
+  readonly discriminator = 4
+  readonly kind = "ObjectIdTooLong"
+
+  toJSON(): ObjectIdTooLongJSON {
+    return {
+      kind: "ObjectIdTooLong",
+    }
+  }
+
+  toEncodable() {
+    return {
+      ObjectIdTooLong: {},
+    }
+  }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function fromDecoded(obj: any): types.SdkErrorKind {
   if (typeof obj !== "object") {
@@ -104,6 +125,9 @@ export function fromDecoded(obj: any): types.SdkErrorKind {
   }
   if ("NotEnoughFunds" in obj) {
     return new NotEnoughFunds()
+  }
+  if ("ObjectIdTooLong" in obj) {
+    return new ObjectIdTooLong()
   }
 
   throw new Error("Invalid enum object")
@@ -123,6 +147,9 @@ export function fromJSON(obj: types.SdkErrorJSON): types.SdkErrorKind {
     case "NotEnoughFunds": {
       return new NotEnoughFunds()
     }
+    case "ObjectIdTooLong": {
+      return new ObjectIdTooLong()
+    }
   }
 }
 
@@ -132,6 +159,7 @@ export function layout(property?: string) {
     borsh.struct([], "PriceError"),
     borsh.struct([], "AllItemsAreSold"),
     borsh.struct([], "NotEnoughFunds"),
+    borsh.struct([], "ObjectIdTooLong"),
   ])
   if (property !== undefined) {
     return ret.replicate(property)
