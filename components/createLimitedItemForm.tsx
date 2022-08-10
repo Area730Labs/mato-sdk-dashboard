@@ -30,7 +30,7 @@ export interface CreateItemForm{
     game_uid: string,
 };
 
-export const USDC_TOKEN = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+export const USDC_TOKEN = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
 export const SOL_TOKEN = new PublicKey("So11111111111111111111111111111111111111112");
 
 export default function CreateLimitedItemForm(props) {

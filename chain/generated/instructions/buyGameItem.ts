@@ -11,10 +11,11 @@ export interface BuyGameItemArgs {
 export interface BuyGameItemAccounts {
   signer: PublicKey
   project: PublicKey
-  walletAuthority: PublicKey
+  mintAuthority: PublicKey
   mint: PublicKey
-  buyerTokenAccount: PublicKey
-  escrowTokenAccount: PublicKey
+  buyerItemTokenAccount: PublicKey
+  buyerPaymentTokenAccount: PublicKey
+  escrowPaymentTokenAccount: PublicKey
   mintMeta: PublicKey
   tokenProgram: PublicKey
 }
@@ -28,10 +29,23 @@ export function buyGameItem(
   const keys = [
     { pubkey: accounts.signer, isSigner: false, isWritable: true },
     { pubkey: accounts.project, isSigner: false, isWritable: true },
-    { pubkey: accounts.walletAuthority, isSigner: false, isWritable: true },
+    { pubkey: accounts.mintAuthority, isSigner: false, isWritable: true },
     { pubkey: accounts.mint, isSigner: false, isWritable: true },
-    { pubkey: accounts.buyerTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: accounts.escrowTokenAccount, isSigner: false, isWritable: true },
+    {
+      pubkey: accounts.buyerItemTokenAccount,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: accounts.buyerPaymentTokenAccount,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: accounts.escrowPaymentTokenAccount,
+      isSigner: false,
+      isWritable: true,
+    },
     { pubkey: accounts.mintMeta, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
   ]

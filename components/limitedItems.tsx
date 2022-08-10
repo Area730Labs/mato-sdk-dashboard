@@ -27,6 +27,11 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useAppContext } from '../core/appcontext';
 import { Keypair, PublicKey, Signer } from '@solana/web3.js';
 import { SdkProject } from '../chain/generated/accounts';
+import { SdkItemMeta } from '../chain/generated/accounts/SdkItemMeta';
+import { findAssociatedTokenAddress } from '../core/pdautils';
+import {
+    createAssociatedTokenAccountInstruction
+} from '@solana/spl-token';
 
 function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
@@ -65,6 +70,8 @@ export default function LimitedItems() {
 
         const project_info = await SdkProject.fetch(connection,project_id);
 
+        console.log('creating game item with uid: ',data.game_uid);
+
         const ix = new ChainSdk(wallet.adapter).createItem(
             project_id,
             project_info,
@@ -91,8 +98,8 @@ export default function LimitedItems() {
             } as Signer,
         ];
         
-        sendTx([ix],"other", signers).then(() => {
-            console.log('tx sent')
+        sendTx([ix],"other", signers).then((sig) => {
+            console.log('tx sent',sig)
         }).catch((e) => {
             console.error('got an error: ',e)
         });
@@ -133,6 +140,65 @@ export default function LimitedItems() {
         
         // setItems(newItems);
     }
+    const create_signer_item_account = async  => {
+
+        const mint = new PublicKey("2G7YZaFWPAJLPwJNUZFMcY2eLJSCvyngJ7wBoCj5DSr6");
+
+        console.log(wallet.adapter.publicKey.toString())
+
+        let token_addr = findAssociatedTokenAddress(wallet.adapter.publicKey,mint);
+
+        let ix = createAssociatedTokenAccountInstruction(
+            wallet.adapter.publicKey,
+            token_addr,
+            wallet.adapter.publicKey,
+            mint
+        );
+
+        sendTx([ix],"other", []).then((sig) => {
+            console.log('tx sent',sig)
+        }).catch((e) => {
+            console.error('got an error: ',e)
+        });
+    }
+    const create_escrow_payment_account = async  => {
+
+        const project_uid = new PublicKey("3jMSn7jd6DXGsu55iMus7DApi2AEkiNGRwV16Rqpwhrg");
+        const mint = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
+
+        const ix = new ChainSdk(wallet.adapter).createEscrowTokenAccount(
+            project_uid,
+            mint,
+        );
+
+        sendTx([ix],"other", []).then((sig) => {
+            console.log('tx sent',sig)
+        }).catch((e) => {
+            console.error('got an error: ',e)
+        });
+    }
+
+    const buyItem = async e => {
+        const project_id = new PublicKey("b5XHK9Hfcfp9QJ3kowao8N3D9mEQs5FrUL4zhP6pmfi");
+        const product_meta_id = new PublicKey("EyEjLtBHiEUoDfNVJRHUTaXmd3ToAzGxSKaLLtfJ4HcX");
+        const product_mint = new PublicKey("2G7YZaFWPAJLPwJNUZFMcY2eLJSCvyngJ7wBoCj5DSr6");
+
+        const project_info = await SdkProject.fetch(connection,project_id);
+        const product_meta = await SdkItemMeta.fetch(connection,product_meta_id);
+
+        const ix = new ChainSdk(wallet.adapter).buyItem(
+            project_id,
+            project_info,
+            product_mint,
+            product_meta,
+        );
+
+        sendTx([ix],"other", []).then((sig) => {
+            console.log('tx sent',sig)
+        }).catch((e) => {
+            console.error('got an error: ',e)
+        });
+    }
 
 
     return (<>
@@ -141,6 +207,15 @@ export default function LimitedItems() {
             <Spacer />
             <Button colorScheme='teal' size='sm' onClick={onOpen}>
                 Add new
+            </Button>
+            <Button colorScheme='teal' size='sm' onClick={buyItem}>
+                Buy one item
+            </Button>
+            <Button colorScheme='teal' size='sm' onClick={create_escrow_payment_account}>
+                create escrow pacc
+            </Button>
+            <Button colorScheme='teal' size='sm' onClick={create_signer_item_account}>
+                create signer iacc
             </Button>
         </Flex>
 

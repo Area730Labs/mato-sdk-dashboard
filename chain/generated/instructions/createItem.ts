@@ -14,9 +14,9 @@ export interface CreateItemArgs {
 export interface CreateItemAccounts {
   project: PublicKey
   meta: PublicKey
-  metaAlias: PublicKey
   mint: PublicKey
   authority: PublicKey
+  mintAuthority: PublicKey
   priceMint: PublicKey
   tokenProgram: PublicKey
   rentProgram: PublicKey
@@ -34,9 +34,9 @@ export function createItem(args: CreateItemArgs, accounts: CreateItemAccounts) {
   const keys = [
     { pubkey: accounts.project, isSigner: false, isWritable: false },
     { pubkey: accounts.meta, isSigner: false, isWritable: true },
-    { pubkey: accounts.metaAlias, isSigner: false, isWritable: true },
     { pubkey: accounts.mint, isSigner: true, isWritable: true },
     { pubkey: accounts.authority, isSigner: true, isWritable: true },
+    { pubkey: accounts.mintAuthority, isSigner: false, isWritable: true },
     { pubkey: accounts.priceMint, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.rentProgram, isSigner: false, isWritable: false },

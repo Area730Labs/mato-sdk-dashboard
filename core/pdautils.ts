@@ -1,5 +1,8 @@
 import { PublicKey } from "@solana/web3.js";
 import global_config from "./config";
+import {
+    TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID
+} from '@solana/spl-token';
 
 export function calcAddressWithSeed(seed: string, address: PublicKey): [PublicKey, number] {
     const buffers = [Buffer.from(seed, 'utf8'), address.toBuffer()];
@@ -40,4 +43,18 @@ export function string_to_buffer(val: string): number[] {
     console.log('string value: ',result)
     
     return result;
+}
+
+export function findAssociatedTokenAddress(
+    walletAddress: PublicKey,
+    tokenMintAddress: PublicKey
+): PublicKey {
+    return PublicKey.findProgramAddressSync(
+        [
+            walletAddress.toBuffer(),
+            TOKEN_PROGRAM_ID.toBuffer(),
+            tokenMintAddress.toBuffer(),
+        ],
+        ASSOCIATED_TOKEN_PROGRAM_ID
+    )[0];
 }

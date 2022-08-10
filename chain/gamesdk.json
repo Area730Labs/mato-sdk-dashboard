@@ -16,7 +16,7 @@
           "isSigner": false
         },
         {
-          "name": "walletAuthority",
+          "name": "mintAuthority",
           "isMut": true,
           "isSigner": false
         },
@@ -26,12 +26,17 @@
           "isSigner": false
         },
         {
-          "name": "buyerTokenAccount",
+          "name": "buyerItemTokenAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "escrowTokenAccount",
+          "name": "buyerPaymentTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "escrowPaymentTokenAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -117,11 +122,6 @@
           "isSigner": false
         },
         {
-          "name": "metaAlias",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "mint",
           "isMut": true,
           "isSigner": true
@@ -130,6 +130,11 @@
           "name": "authority",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "priceMint",
