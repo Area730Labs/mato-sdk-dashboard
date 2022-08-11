@@ -1,23 +1,18 @@
 import Login from '../components/login';
 import Dashboard from '../components/dashboard';
-import { AppProvider } from "../core/appcontext";
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useAppContext } from "../core/appcontext";
 
 function PageWrapper({ children }) {
 
-  let {wallet} = useWallet();
-
-  return <AppProvider wallet={wallet.adapter}>
-    <div class="container w-4/5 mx-auto">
+  return <div class="container w-4/5 mx-auto">
       {children ?? null}
     </div>
-  </AppProvider>
 }
 
 export default function Home() {
-  const { isLoggedIn } = true;
+  const { authorized } = useAppContext();
 
-  return (isLoggedIn ? <PageWrapper>
+  return (authorized ? <PageWrapper>
     <Dashboard />
   </PageWrapper> : <Login />
   )

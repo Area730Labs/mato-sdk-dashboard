@@ -5,10 +5,9 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { Spinner } from '@chakra-ui/react'
 import React from "react";
 
-
 export default function Login() {
-  const { connecting, publicKey } = useWallet();
 
+  const { connecting, publicKey} = useWallet();
   const msg = publicKey ? 'Fetching data...' : 'Connecting wallet...';
 
   let inProgress = connecting || publicKey;

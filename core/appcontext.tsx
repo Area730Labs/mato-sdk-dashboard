@@ -6,11 +6,16 @@ import { TxHandler } from "./handler";
 import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
 import { createRpcWrapper, execRpcTask, QueuedRpcRequest, SolanaRpc } from "./rpc";
 import global_config from "./config";
+import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes/index";
+import { v4 as uuidv4 } from 'uuid';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 export type TransactionType = "stake" | "unstake" | "platform" | "claim" | "other"
 export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
 
 export interface AppContextType {
+
+    authorized: boolean
     // solana 
     solanaConnection: SolanaRpc
     setSolanaNode: any
@@ -32,11 +37,11 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function AppProvider({ children,wallet }: { children: ReactNode, wallet: WalletAdapter }) {
+export function AppProvider({ children }: { children: ReactNode }) {
 
     // const [lang, setLang] = useState<Lang>(getLanguageFromCache());
     const [solanaNode, setSolanaNode] = useState<string>(global_config.cluster_url)
-    const [connectedWallet, setWallet] = useState<WalletAdapter>(wallet);
+    const [connectedWallet, setWallet] = useState<WalletAdapter| null>(null);
 
     const [curtx, setCurtx] = useState<CurrentTx | null>(null);
     const [userUpdatesCounter, setUserUpdatesCounter] = useState(0);
@@ -45,6 +50,9 @@ export function AppProvider({ children,wallet }: { children: ReactNode, wallet: 
     const [lastRpcRequest,setLastRpcRequestTime] = useState<number>(0);
     const [queueProcessorStarted, setStarted] = useState(false);
 
+    const { publicKey,signMessage, connected,wallet } = useWallet();
+    const [authorized, setAuthorized] = useState(false);
+
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, {
             commitment: 'confirmed',
@@ -52,6 +60,35 @@ export function AppProvider({ children,wallet }: { children: ReactNode, wallet: 
 
         });
     }, [solanaNode]);
+
+    useEffect(() => {
+        if (connected) {
+
+          setWallet(wallet.adapter);
+    
+          let guid = uuidv4();
+          let bytes = new TextEncoder().encode('authorize request; '+guid);
+    
+          signMessage(bytes).then((signed) => {
+    
+            let sig = bs58.encode(signed);
+           
+            let request = {
+              guid,
+              signature: sig,
+              wallet: publicKey.toString()
+            }
+    
+            setAuthorized(true);
+            console.warn('signed a message', request)
+          
+          }).catch((e) => {
+             console.error('rejected message sign', e.message)
+          });
+        } else {
+            setWallet(null);
+        }
+      },[connected]);
 
     // useEffect(() => {
 
@@ -268,6 +305,8 @@ export function AppProvider({ children,wallet }: { children: ReactNode, wallet: 
     const memoedValue = useMemo(() => {
         const curCtx:AppContextType = {
 
+            authorized,
+
             // wallet
             solanaConnection: rpc_wrapper,
             setSolanaNode,
@@ -286,6 +325,7 @@ export function AppProvider({ children,wallet }: { children: ReactNode, wallet: 
         return curCtx
 
     }, [,
+        authorized,
         rpc_wrapper, connectedWallet,
         curtx, userUpdatesCounter,
         // lang, 

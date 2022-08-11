@@ -8,6 +8,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 import '../styles/globals.css'
+import { AppProvider } from '../core/appcontext';
 
 function App({ Component, pageProps }) {
   const network = WalletAdapterNetwork.Devnet;
@@ -26,7 +27,9 @@ function App({ Component, pageProps }) {
         <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={wallets} >
                 <WalletModalProvider>
-                    <Component {...pageProps} />
+                  <AppProvider>
+                      <Component {...pageProps} />
+                  </AppProvider>
                 </WalletModalProvider>
             </WalletProvider>
         </ConnectionProvider>
