@@ -2,11 +2,9 @@ import React, { useState } from "react";
 import { useWallet } from '@solana/wallet-adapter-react';
 import Charts from './charts';
 import LimitedItems from './limitedItems';
-import { AppContext, useAppState } from "./useApp";
 
 export default function Dashboard() {
     const { disconnect, publicKey, wallet } = useWallet();
-    const { dispatch } = useAppState();
 
     let [tab, setTab] = useState('limited-items');
 
@@ -45,7 +43,7 @@ export default function Dashboard() {
             styles: "font-bold",
             btnAction: () => {
                 disconnect().catch(() => { });
-                dispatch({ type: 'logOut' });
+                console.log('log out');
             },
             component: null
         }

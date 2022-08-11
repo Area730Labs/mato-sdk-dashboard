@@ -5,7 +5,6 @@ import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adap
 import { clusterApiUrl } from '@solana/web3.js';
 import {useMemo} from 'react'
 import { ChakraProvider } from '@chakra-ui/react'
-import { AppStateProvider } from '../components/useApp';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 import '../styles/globals.css'
@@ -23,14 +22,11 @@ function App({ Component, pageProps }) {
   );
 
   return(
-    
       <ChakraProvider>
         <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={wallets} >
                 <WalletModalProvider>
-                  <AppStateProvider>
                     <Component {...pageProps} />
-                  </AppStateProvider>
                 </WalletModalProvider>
             </WalletProvider>
         </ConnectionProvider>

@@ -2,8 +2,6 @@ import Login from '../components/login';
 import Dashboard from '../components/dashboard';
 import { AppProvider } from "../core/appcontext";
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useAppState } from '../components/useApp';
-
 
 function PageWrapper({ children }) {
 
@@ -17,7 +15,7 @@ function PageWrapper({ children }) {
 }
 
 export default function Home() {
-  const { isLoggedIn } = useAppState().state;
+  const { isLoggedIn } = true;
 
   return (isLoggedIn ? <PageWrapper>
     <Dashboard />

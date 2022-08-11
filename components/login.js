@@ -32,7 +32,7 @@ export default function Login() {
       {!inProgress && (
         <>
           <h1 className="text-3xl text-center">
-            Please login<br/>👇
+            Connect your solana wallet to start
           </h1>
 
           <p className={styles.description}>

@@ -1,5 +1,5 @@
-import { 
-    Button, 
+import {
+    Button,
     ButtonGroup ,
     Flex,
     Spacer,
@@ -21,28 +21,23 @@ import { useDisclosure } from '@chakra-ui/react'
 import CreateLimitedItemForm, { CreateItemForm } from './createLimitedItemForm';
 import ProgressDialog from './progressDialog';
 import LimitedRowItem from './limitedItemRow'
-import { useAppState } from './useApp';
 import ChainSdk from '../chain/sdk';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useAppContext } from '../core/appcontext';
-import { Keypair, PublicKey, Signer } from '@solana/web3.js';
+import { Connection, Keypair, Message, PublicKey, Signer, Transaction } from '@solana/web3.js';
 import { SdkProject } from '../chain/generated/accounts';
 import { SdkItemMeta } from '../chain/generated/accounts/SdkItemMeta';
 import { findAssociatedTokenAddress } from '../core/pdautils';
 import {
     createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
-
-function getRandomInt(max: number) {
-    return Math.floor(Math.random() * max);
-}
+import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes';
 
 export default function LimitedItems() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const toast = useToast();
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
 
-    const { state, dispatch, actions } = useAppState();
     const {wallet} = useWallet();
     const {sendTx,connection} = useAppContext();
 
@@ -59,7 +54,7 @@ export default function LimitedItems() {
         }
     };
 
-    const itemsList = state.serverData.limited_items;
+    const itemsList = [];
 
     const onDataSave = async (data : CreateItemForm) => {
         onClose();
@@ -93,11 +88,11 @@ export default function LimitedItems() {
 
         const signers = [
             {
-                publicKey: mint_keypair.publicKey, 
+                publicKey: mint_keypair.publicKey,
                 secretKey: mint_keypair.secretKey
             } as Signer,
         ];
-        
+
         sendTx([ix],"other", signers).then((sig) => {
             console.log('tx sent',sig)
         }).catch((e) => {
@@ -125,19 +120,19 @@ export default function LimitedItems() {
         //         position: 'top'
         //     });
         // }
-        
+
     };
 
-    
+
     const onActivateItemHandler = e => {
         // const mint = e.target.name;
         // let index = items.findIndex(a => a.mint === mint);
-        
+
         // let newItems = [...items];
         // let item = {...newItems[index]};
         // item.active = !item.active;
         // newItems[index] = item;
-        
+
         // setItems(newItems);
     }
     const create_signer_item_account = async  => {
@@ -178,6 +173,30 @@ export default function LimitedItems() {
         });
     }
 
+    const testTx = async e => {
+
+        let txData = await fetch('https://cldfn.com/matosolana/buy/D6ipFk7ZmTw8HRRtkKsxKY4zAQCriCkLztZyCERdT41C/1/CUnDxJCbAEtrN9yruSfWx1oD8dFj7os78Rfqe9LHaMDy');
+        let txJson = await txData.json();
+        let conn = new Connection("https://api.devnet.solana.com");
+
+        // let default_signatue = bs58.encode(Buffer.alloc(64).fill(0));
+
+        let tx_message_bytes = Buffer.from(txJson.tx, 'base64');
+
+        // let tx_message = Message.from(tx_message_bytes);
+        let tx = Transaction.from(tx_message_bytes);
+
+        let rawtx = tx.serialize({verifySignatures: false});
+
+        console.warn(bs58.encode(rawtx));
+
+        wallet.adapter.sendTransaction(tx,connection,{
+            skipPreflight: true
+        });
+        
+        // let res = await wallet.adapter.sendTransaction();
+    }
+
     const buyItem = async e => {
         const project_id = new PublicKey("b5XHK9Hfcfp9QJ3kowao8N3D9mEQs5FrUL4zhP6pmfi");
         const product_meta_id = new PublicKey("EyEjLtBHiEUoDfNVJRHUTaXmd3ToAzGxSKaLLtfJ4HcX");
@@ -202,20 +221,23 @@ export default function LimitedItems() {
 
 
     return (<>
-        <Flex w="100%" p="1rem" borderBottom='1px' borderColor='gray.200'>
+        <Flex w="100%" p="1rem">
             <p className="not-italic text-xl font-bold pl-2">Limited items</p>
             <Spacer />
             <Button colorScheme='teal' size='sm' onClick={onOpen}>
-                Add new
+                new item
             </Button>
             <Button colorScheme='teal' size='sm' onClick={buyItem}>
-                Buy one item
+                Buy static
+            </Button>
+            <Button colorScheme='teal' size='sm' onClick={testTx}>
+                test tx
             </Button>
             <Button colorScheme='teal' size='sm' onClick={create_escrow_payment_account}>
-                create escrow pacc
+                +escrow payment acc
             </Button>
             <Button colorScheme='teal' size='sm' onClick={create_signer_item_account}>
-                create signer iacc
+                +signer item acc
             </Button>
         </Flex>
 
@@ -228,20 +250,18 @@ export default function LimitedItems() {
                 <Thead>
                     <Tr>
                         {/* <Th textAlign='center' width='0em'>Enabled</Th> */}
-                        <Th>Name</Th>
                         <Th>Game UID</Th>
                         <Th>Mint</Th>
                         <Th isNumeric>Supply</Th>
                         <Th isNumeric>Price</Th>
-                        <Th isNumeric>Sales</Th>
-                        <Th textAlign='end'>Sold</Th>
+                        <Th isNumeric textAlign='end'>Sales</Th>
                     </Tr>
                 </Thead>
                 <Tbody>
                     {itemsList.map((item) => (<LimitedRowItem key={item.mint} {...item} showCopyOkToast={showCopyOkToast} enableHandler={onActivateItemHandler} />))}
                 </Tbody>
-               
-            </Table>    
+
+            </Table>
         </TableContainer>
     </>);
 }
