@@ -7,25 +7,31 @@ import { PROGRAM_ID } from "../programId"
 export interface SdkProjectFields {
   authority: PublicKey
   escrow: PublicKey
+  marketEscrow: PublicKey
   uid: PublicKey
   bump: number
   escrowBump: number
+  marketEscrowBump: number
 }
 
 export interface SdkProjectJSON {
   authority: string
   escrow: string
+  marketEscrow: string
   uid: string
   bump: number
   escrowBump: number
+  marketEscrowBump: number
 }
 
 export class SdkProject {
   readonly authority: PublicKey
   readonly escrow: PublicKey
+  readonly marketEscrow: PublicKey
   readonly uid: PublicKey
   readonly bump: number
   readonly escrowBump: number
+  readonly marketEscrowBump: number
 
   static readonly discriminator = Buffer.from([
     27, 88, 211, 108, 68, 30, 244, 70,
@@ -34,17 +40,21 @@ export class SdkProject {
   static readonly layout = borsh.struct([
     borsh.publicKey("authority"),
     borsh.publicKey("escrow"),
+    borsh.publicKey("marketEscrow"),
     borsh.publicKey("uid"),
     borsh.u8("bump"),
     borsh.u8("escrowBump"),
+    borsh.u8("marketEscrowBump"),
   ])
 
   constructor(fields: SdkProjectFields) {
     this.authority = fields.authority
     this.escrow = fields.escrow
+    this.marketEscrow = fields.marketEscrow
     this.uid = fields.uid
     this.bump = fields.bump
     this.escrowBump = fields.escrowBump
+    this.marketEscrowBump = fields.marketEscrowBump
   }
 
   static async fetch(
@@ -86,14 +96,18 @@ export class SdkProject {
       throw new Error("invalid account discriminator")
     }
 
+    console.warn("data length is :"+data.length);
+
     const dec = SdkProject.layout.decode(data.slice(8))
 
     return new SdkProject({
       authority: dec.authority,
       escrow: dec.escrow,
+      marketEscrow: dec.marketEscrow,
       uid: dec.uid,
       bump: dec.bump,
       escrowBump: dec.escrowBump,
+      marketEscrowBump: dec.marketEscrowBump,
     })
   }
 
@@ -101,9 +115,11 @@ export class SdkProject {
     return {
       authority: this.authority.toString(),
       escrow: this.escrow.toString(),
+      marketEscrow: this.marketEscrow.toString(),
       uid: this.uid.toString(),
       bump: this.bump,
       escrowBump: this.escrowBump,
+      marketEscrowBump: this.marketEscrowBump,
     }
   }
 
@@ -111,9 +127,11 @@ export class SdkProject {
     return new SdkProject({
       authority: new PublicKey(obj.authority),
       escrow: new PublicKey(obj.escrow),
+      marketEscrow: new PublicKey(obj.marketEscrow),
       uid: new PublicKey(obj.uid),
       bump: obj.bump,
       escrowBump: obj.escrowBump,
+      marketEscrowBump: obj.marketEscrowBump,
     })
   }
 }

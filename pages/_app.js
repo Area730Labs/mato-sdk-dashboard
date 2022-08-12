@@ -9,6 +9,8 @@ import { ChakraProvider } from '@chakra-ui/react'
 import '@solana/wallet-adapter-react-ui/styles.css';
 import '../styles/globals.css'
 import { AppProvider } from '../core/appcontext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App({ Component, pageProps }) {
   const network = WalletAdapterNetwork.Devnet;
@@ -33,8 +35,8 @@ function App({ Component, pageProps }) {
                 </WalletModalProvider>
             </WalletProvider>
         </ConnectionProvider>
+        <ToastContainer position='bottom-right' />
       </ChakraProvider>
-    
   );
 }
 

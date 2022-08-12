@@ -108,6 +108,48 @@ export class ObjectIdTooLong {
   }
 }
 
+export interface MarketEscrowErrorJSON {
+  kind: "MarketEscrowError"
+}
+
+export class MarketEscrowError {
+  readonly discriminator = 5
+  readonly kind = "MarketEscrowError"
+
+  toJSON(): MarketEscrowErrorJSON {
+    return {
+      kind: "MarketEscrowError",
+    }
+  }
+
+  toEncodable() {
+    return {
+      MarketEscrowError: {},
+    }
+  }
+}
+
+export interface ListingInfoHackedJSON {
+  kind: "ListingInfoHacked"
+}
+
+export class ListingInfoHacked {
+  readonly discriminator = 6
+  readonly kind = "ListingInfoHacked"
+
+  toJSON(): ListingInfoHackedJSON {
+    return {
+      kind: "ListingInfoHacked",
+    }
+  }
+
+  toEncodable() {
+    return {
+      ListingInfoHacked: {},
+    }
+  }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function fromDecoded(obj: any): types.SdkErrorKind {
   if (typeof obj !== "object") {
@@ -128,6 +170,12 @@ export function fromDecoded(obj: any): types.SdkErrorKind {
   }
   if ("ObjectIdTooLong" in obj) {
     return new ObjectIdTooLong()
+  }
+  if ("MarketEscrowError" in obj) {
+    return new MarketEscrowError()
+  }
+  if ("ListingInfoHacked" in obj) {
+    return new ListingInfoHacked()
   }
 
   throw new Error("Invalid enum object")
@@ -150,6 +198,12 @@ export function fromJSON(obj: types.SdkErrorJSON): types.SdkErrorKind {
     case "ObjectIdTooLong": {
       return new ObjectIdTooLong()
     }
+    case "MarketEscrowError": {
+      return new MarketEscrowError()
+    }
+    case "ListingInfoHacked": {
+      return new ListingInfoHacked()
+    }
   }
 }
 
@@ -160,6 +214,8 @@ export function layout(property?: string) {
     borsh.struct([], "AllItemsAreSold"),
     borsh.struct([], "NotEnoughFunds"),
     borsh.struct([], "ObjectIdTooLong"),
+    borsh.struct([], "MarketEscrowError"),
+    borsh.struct([], "ListingInfoHacked"),
   ])
   if (property !== undefined) {
     return ret.replicate(property)

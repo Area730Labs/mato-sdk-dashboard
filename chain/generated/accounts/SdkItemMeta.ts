@@ -11,6 +11,7 @@ export interface SdkItemMetaFields {
   itemId: Array<number>
   price: BN
   priceMint: PublicKey
+  inactive: boolean
 }
 
 export interface SdkItemMetaJSON {
@@ -20,6 +21,7 @@ export interface SdkItemMetaJSON {
   itemId: Array<number>
   price: string
   priceMint: string
+  inactive: boolean
 }
 
 export class SdkItemMeta {
@@ -29,6 +31,7 @@ export class SdkItemMeta {
   readonly itemId: Array<number>
   readonly price: BN
   readonly priceMint: PublicKey
+  readonly inactive: boolean
 
   static readonly discriminator = Buffer.from([
     34, 61, 25, 143, 19, 241, 49, 37,
@@ -41,6 +44,7 @@ export class SdkItemMeta {
     borsh.array(borsh.u8(), 32, "itemId"),
     borsh.u64("price"),
     borsh.publicKey("priceMint"),
+    borsh.bool("inactive"),
   ])
 
   constructor(fields: SdkItemMetaFields) {
@@ -50,6 +54,7 @@ export class SdkItemMeta {
     this.itemId = fields.itemId
     this.price = fields.price
     this.priceMint = fields.priceMint
+    this.inactive = fields.inactive
   }
 
   static async fetch(
@@ -100,6 +105,7 @@ export class SdkItemMeta {
       itemId: dec.itemId,
       price: dec.price,
       priceMint: dec.priceMint,
+      inactive: dec.inactive,
     })
   }
 
@@ -111,6 +117,7 @@ export class SdkItemMeta {
       itemId: this.itemId,
       price: this.price.toString(),
       priceMint: this.priceMint.toString(),
+      inactive: this.inactive,
     }
   }
 
@@ -122,6 +129,7 @@ export class SdkItemMeta {
       itemId: obj.itemId,
       price: new BN(obj.price),
       priceMint: new PublicKey(obj.priceMint),
+      inactive: obj.inactive,
     })
   }
 }

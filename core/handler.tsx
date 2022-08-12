@@ -37,7 +37,6 @@ class TxHandler {
         if (signers != null && signers.length > 0) {
             return this.wallet.sendTransaction(tx, this.connection, {
                 signers: signers,
-                skipPreflight : true,
             } as SendTransactionOptions);
         } else {
             return this.wallet.sendTransaction(tx, this.connection);

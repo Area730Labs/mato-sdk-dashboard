@@ -3,6 +3,151 @@
   "name": "gamesdk",
   "instructions": [
     {
+      "name": "marketList",
+      "accounts": [
+        {
+          "name": "seller",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintMeta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "listingInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketEscrow",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "paymentTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "paymentTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellerItemTokenAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "totalPrice",
+          "type": "u64"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "expireAt",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "marketBuy",
+      "accounts": [
+        {
+          "name": "buyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "seller",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "project",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "listingInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketEscrow",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketEscrowTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "paymentTokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "sellerPaymentTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "paymentBuyerTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "buyerItemTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "buyGameItem",
       "accounts": [
         {
@@ -87,6 +232,11 @@
           "isSigner": false
         },
         {
+          "name": "marketEscrow",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "rentProgram",
           "isMut": false,
           "isSigner": false
@@ -104,6 +254,10 @@
         },
         {
           "name": "escrowBump",
+          "type": "u8"
+        },
+        {
+          "name": "marketEscrowBump",
           "type": "u8"
         }
       ]
@@ -223,6 +377,10 @@
           {
             "name": "priceMint",
             "type": "publicKey"
+          },
+          {
+            "name": "inactive",
+            "type": "bool"
           }
         ]
       }
@@ -241,6 +399,10 @@
             "type": "publicKey"
           },
           {
+            "name": "marketEscrow",
+            "type": "publicKey"
+          },
+          {
             "name": "uid",
             "type": "publicKey"
           },
@@ -251,6 +413,54 @@
           {
             "name": "escrowBump",
             "type": "u8"
+          },
+          {
+            "name": "marketEscrowBump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Listing",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "project",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "seller",
+            "type": "publicKey"
+          },
+          {
+            "name": "saleAmount",
+            "type": "u64"
+          },
+          {
+            "name": "salePriceTotal",
+            "type": "u64"
+          },
+          {
+            "name": "saleExpireAt",
+            "type": "u64"
+          },
+          {
+            "name": "paymentTokenMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "sellerPaymentTokenAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "marketEscrowTokenAccount",
+            "type": "publicKey"
           }
         ]
       }
@@ -276,6 +486,12 @@
           },
           {
             "name": "ObjectIdTooLong"
+          },
+          {
+            "name": "MarketEscrowError"
+          },
+          {
+            "name": "ListingInfoHacked"
           }
         ]
       }

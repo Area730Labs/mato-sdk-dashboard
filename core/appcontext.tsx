@@ -10,7 +10,7 @@ import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes/index";
 import { v4 as uuidv4 } from 'uuid';
 import { useWallet } from '@solana/wallet-adapter-react';
 
-export type TransactionType = "stake" | "unstake" | "platform" | "claim" | "other"
+export type TransactionType = "system" | "platform"| "other"
 export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
 
 export interface AppContextType {
@@ -222,15 +222,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 const tx_type = curtx.Type;
 
                 switch (tx_type) {
-                    case 'claim': {
-                        const timeTook = new Date().getTime() - curtx.CreatedAt;
-                        console.log('calc income for time when tx were confirming', timeTook)
-                        setUserUpdatesCounter(userUpdatesCounter + 1);
-                        break;
-                    }
-                    case 'stake':
-                    case 'unstake': {
-                        setUserUpdatesCounter(userUpdatesCounter + 1);
+                    // case 'claim': {
+                    //     const timeTook = new Date().getTime() - curtx.CreatedAt;
+                    //     console.log('calc income for time when tx were confirming', timeTook)
+                    //     setUserUpdatesCounter(userUpdatesCounter + 1);
+                    //     break;
+                    // }
+                    // case 'stake':
+                    // case 'unstake': {
+                    //     setUserUpdatesCounter(userUpdatesCounter + 1);
+                    //     break;
+                    // }
+                    case 'system':{
                         break;
                     }
                     default: {

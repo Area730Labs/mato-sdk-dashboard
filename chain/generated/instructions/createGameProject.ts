@@ -7,6 +7,7 @@ import { PROGRAM_ID } from "../programId"
 export interface CreateGameProjectArgs {
   projectBump: number
   escrowBump: number
+  marketEscrowBump: number
 }
 
 export interface CreateGameProjectAccounts {
@@ -15,6 +16,7 @@ export interface CreateGameProjectAccounts {
   authority: PublicKey
   project: PublicKey
   escrow: PublicKey
+  marketEscrow: PublicKey
   rentProgram: PublicKey
   systemProgram: PublicKey
 }
@@ -22,6 +24,7 @@ export interface CreateGameProjectAccounts {
 export const layout = borsh.struct([
   borsh.u8("projectBump"),
   borsh.u8("escrowBump"),
+  borsh.u8("marketEscrowBump"),
 ])
 
 export function createGameProject(
@@ -34,6 +37,7 @@ export function createGameProject(
     { pubkey: accounts.authority, isSigner: false, isWritable: false },
     { pubkey: accounts.project, isSigner: false, isWritable: true },
     { pubkey: accounts.escrow, isSigner: false, isWritable: false },
+    { pubkey: accounts.marketEscrow, isSigner: false, isWritable: false },
     { pubkey: accounts.rentProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
   ]
@@ -43,6 +47,7 @@ export function createGameProject(
     {
       projectBump: args.projectBump,
       escrowBump: args.escrowBump,
+      marketEscrowBump: args.marketEscrowBump,
     },
     buffer
   )

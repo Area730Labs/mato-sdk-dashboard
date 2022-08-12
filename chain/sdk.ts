@@ -4,7 +4,6 @@ import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { calcAddressWithSeed, calcAddressWithTwoSeeds, findAssociatedTokenAddress, string_to_buffer } from "../core/pdautils";
 import { createItem, CreateItemAccounts, CreateItemArgs } from "./generated/instructions/createItem";
 import BN from "bn.js"
-import global_config from "../core/config";
 import {
     TOKEN_PROGRAM_ID,createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
@@ -20,9 +19,9 @@ class ChainSdk {
         this.signer = s;
     }
 
-    createEscrowTokenAccount(project_uid: PublicKey, mint: PublicKey) {
+    createEscrowTokenAccount(project_address: PublicKey, mint: PublicKey) {
 
-        let escrow_account = calcAddressWithSeed("escrow", project_uid);
+        let escrow_account = calcAddressWithSeed("escrow", project_address);
 
         let escrow_payment_addr = findAssociatedTokenAddress(
             escrow_account[0],
@@ -61,7 +60,7 @@ class ChainSdk {
 
         // create if not exists 
 
-        let escrow_account = calcAddressWithSeed("escrow", project.uid);
+        let escrow_account = calcAddressWithSeed("escrow", project_addr);
         let escrow_payment_addr = findAssociatedTokenAddress(
             escrow_account[0],
             mint_meta.priceMint
@@ -87,7 +86,7 @@ class ChainSdk {
     }
 
     createItem(
-        project_id: PublicKey,
+        project_address: PublicKey,
         project: SdkProject,
         mint: PublicKey,
         max: number,
@@ -95,10 +94,10 @@ class ChainSdk {
         id: string, url: string,
     ) {
 
-        let id_buffer = string_to_buffer(id);
-        let url_buffer = string_to_buffer(url);
+        // let id_buffer = string_to_buffer(id);
+        // let url_buffer = string_to_buffer(url);
 
-        let escrow_account = calcAddressWithSeed("escrow", project.uid);
+        let escrow_account = calcAddressWithSeed("escrow", project_address);
         let meta = calcAddressWithSeed("meta", mint);
         // let meta_alias = calcAddressWithTwoSeeds("alias",Buffer.from(id_buffer),project.uid);
 
@@ -109,9 +108,11 @@ class ChainSdk {
             itemId: id
         };
 
+        let escrow_account_old = calcAddressWithSeed("escrow", project.uid);
+
         // todo: add project authority
         const ixAccounts: CreateItemAccounts = {
-            project: project_id,
+            project: project_address,
             meta: meta[0],
             // metaAlias: meta_alias[0],
             mint: mint,
@@ -131,11 +132,13 @@ class ChainSdk {
         const uid = new Keypair().publicKey;
 
         let [project_addr, project_bump] = calcAddressWithSeed("project", uid);
-        let [escrow_addr, escrow_bump] = calcAddressWithSeed("escrow", uid);
+        let [escrow_addr, escrow_bump] = calcAddressWithSeed("escrow", project_addr);
+        let market_escrow = calcAddressWithSeed("market_escrow", project_addr);
 
         const ixArgs: CreateGameProjectArgs = {
             projectBump: project_bump,
-            escrowBump: escrow_bump
+            escrowBump: escrow_bump,
+            marketEscrowBump: market_escrow[1],
         };
 
         const ixAccounts: CreateGameProjectAccounts = {
@@ -144,6 +147,7 @@ class ChainSdk {
             authority: this.signer.publicKey,
             project: project_addr,
             escrow: escrow_addr,
+            marketEscrow: market_escrow[0],
             rentProgram: SYSVAR_RENT_PUBKEY,
             systemProgram: SystemProgram.programId
         };

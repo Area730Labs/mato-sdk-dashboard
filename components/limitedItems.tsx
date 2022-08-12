@@ -1,6 +1,6 @@
 import {
     Button,
-    ButtonGroup ,
+    ButtonGroup,
     Flex,
     Spacer,
     Table,
@@ -15,7 +15,6 @@ import {
     Switch,
     CircularProgress,
     CircularProgressLabel,
-    useToast,
 } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
 import CreateLimitedItemForm, { CreateItemForm } from './createLimitedItemForm';
@@ -24,52 +23,29 @@ import LimitedRowItem from './limitedItemRow'
 import ChainSdk from '../chain/sdk';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useAppContext } from '../core/appcontext';
-import { Connection, Keypair, Message, PublicKey, Signer, Transaction } from '@solana/web3.js';
-import { SdkProject } from '../chain/generated/accounts';
-import { SdkItemMeta } from '../chain/generated/accounts/SdkItemMeta';
-import { findAssociatedTokenAddress } from '../core/pdautils';
-import {
-    createAssociatedTokenAccountInstruction
-} from '@solana/spl-token';
+import { Connection, Keypair, Signer, Transaction } from '@solana/web3.js';
 import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes';
+import { useProjectContext } from './projectContext';
+import { toast } from 'react-toastify';
 
 export default function LimitedItems() {
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const toast = useToast();
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
 
-    const {wallet} = useWallet();
-    const {sendTx,connection} = useAppContext();
-
-    const showCopyOkToast = () => {
-        if (!toast.isActive('copy-info')) {
-            toast({
-                title: 'Copied mint to clipboard',
-                status: 'info',
-                duration: 3000,
-                isClosable: false,
-                position: 'top',
-                id: 'copy-info'
-            });
-        }
-    };
+    const { wallet } = useWallet();
+    const { sendTx, connection } = useAppContext();
+    const { project: project_id, projectObject, items } = useProjectContext();
 
     const itemsList = [];
 
-    const onDataSave = async (data : CreateItemForm) => {
+    const onDataSave = async (data: CreateItemForm) => {
         onClose();
-        onProgressOpen();
 
-        const project_id = new PublicKey("b5XHK9Hfcfp9QJ3kowao8N3D9mEQs5FrUL4zhP6pmfi");
         const mint_keypair = new Keypair();
-
-        const project_info = await SdkProject.fetch(connection,project_id);
-
-        console.log('creating game item with uid: ',data.game_uid);
 
         const ix = new ChainSdk(wallet.adapter).createItem(
             project_id,
-            project_info,
+            projectObject,
             mint_keypair.publicKey,
             data.supply,
             data.price,
@@ -78,14 +54,6 @@ export default function LimitedItems() {
             "https://arweave.net/K_0cZoEK8wa8_rnlN0Tnwp1DEQfJjffg5dwMi9B7mTU?ext=png"
         );
 
-        const newItem = {
-            ...data,
-            mint: mint_keypair.publicKey,
-            sales: 0,
-            soldPercent: 0,
-            active: false
-        };
-
         const signers = [
             {
                 publicKey: mint_keypair.publicKey,
@@ -93,85 +61,49 @@ export default function LimitedItems() {
             } as Signer,
         ];
 
-        sendTx([ix],"other", signers).then((sig) => {
-            console.log('tx sent',sig)
-        }).catch((e) => {
-            console.error('got an error: ',e)
+        sendTx([ix], "system", signers).catch((e) => {
+            console.error('unable to create an item: ', e)
         });
-
-        // let res = await actions.addNewLimitedItem(state.publicKey, newItem);
-
-        onProgressClose();
-
-        // if (res) {
-        //     toast({
-        //         title: 'Data saved',
-        //         status: 'success',
-        //         duration: 2000,
-        //         isClosable: false,
-        //         position: 'top'
-        //     });
-        // } else {
-        //     toast({
-        //         title: 'Failed to save data',
-        //         status: 'error',
-        //         duration: 2000,
-        //         isClosable: false,
-        //         position: 'top'
-        //     });
-        // }
 
     };
 
+    // const create_signer_item_account = async  => {
 
-    const onActivateItemHandler = e => {
-        // const mint = e.target.name;
-        // let index = items.findIndex(a => a.mint === mint);
+    //     const mint = new PublicKey("2G7YZaFWPAJLPwJNUZFMcY2eLJSCvyngJ7wBoCj5DSr6");
 
-        // let newItems = [...items];
-        // let item = {...newItems[index]};
-        // item.active = !item.active;
-        // newItems[index] = item;
+    //     console.log(wallet.adapter.publicKey.toString())
 
-        // setItems(newItems);
-    }
-    const create_signer_item_account = async  => {
+    //     let token_addr = findAssociatedTokenAddress(wallet.adapter.publicKey,mint);
 
-        const mint = new PublicKey("2G7YZaFWPAJLPwJNUZFMcY2eLJSCvyngJ7wBoCj5DSr6");
+    //     let ix = createAssociatedTokenAccountInstruction(
+    //         wallet.adapter.publicKey,
+    //         token_addr,
+    //         wallet.adapter.publicKey,
+    //         mint
+    //     );
 
-        console.log(wallet.adapter.publicKey.toString())
+    //     sendTx([ix],"other", []).then((sig) => {
+    //         console.log('tx sent',sig)
+    //     }).catch((e) => {
+    //         console.error('got an error: ',e)
+    //     });
+    // }
+    // const create_escrow_payment_account = async  => {
 
-        let token_addr = findAssociatedTokenAddress(wallet.adapter.publicKey,mint);
+    //     const project_uid = new PublicKey("3jMSn7jd6DXGsu55iMus7DApi2AEkiNGRwV16Rqpwhrg");
+    //     const mint = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
 
-        let ix = createAssociatedTokenAccountInstruction(
-            wallet.adapter.publicKey,
-            token_addr,
-            wallet.adapter.publicKey,
-            mint
-        );
+    //     const ix = new ChainSdk(wallet.adapter).createEscrowTokenAccount(
+    //         project_id,
+    //         mint,
+    //     );
 
-        sendTx([ix],"other", []).then((sig) => {
-            console.log('tx sent',sig)
-        }).catch((e) => {
-            console.error('got an error: ',e)
-        });
-    }
-    const create_escrow_payment_account = async  => {
-
-        const project_uid = new PublicKey("3jMSn7jd6DXGsu55iMus7DApi2AEkiNGRwV16Rqpwhrg");
-        const mint = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
-
-        const ix = new ChainSdk(wallet.adapter).createEscrowTokenAccount(
-            project_uid,
-            mint,
-        );
-
-        sendTx([ix],"other", []).then((sig) => {
-            console.log('tx sent',sig)
-        }).catch((e) => {
-            console.error('got an error: ',e)
-        });
-    }
+    //     sendTx([ix],"other", []).then((sig) => {
+    //         console.log('tx sent',sig)
+    //     }).catch((e) => {
+    //         console.error('got an error: ',e)
+    //     });
+    // }
 
     const testTx = async e => {
 
@@ -186,58 +118,38 @@ export default function LimitedItems() {
         // let tx_message = Message.from(tx_message_bytes);
         let tx = Transaction.from(tx_message_bytes);
 
-        let rawtx = tx.serialize({verifySignatures: false});
+        let rawtx = tx.serialize({ verifySignatures: false });
 
         console.warn(bs58.encode(rawtx));
 
-        wallet.adapter.sendTransaction(tx,connection,{
+        wallet.adapter.sendTransaction(tx, connection, {
             skipPreflight: true
         });
-        
+
         // let res = await wallet.adapter.sendTransaction();
     }
 
-    const buyItem = async e => {
-        const project_id = new PublicKey("b5XHK9Hfcfp9QJ3kowao8N3D9mEQs5FrUL4zhP6pmfi");
-        const product_meta_id = new PublicKey("EyEjLtBHiEUoDfNVJRHUTaXmd3ToAzGxSKaLLtfJ4HcX");
-        const product_mint = new PublicKey("2G7YZaFWPAJLPwJNUZFMcY2eLJSCvyngJ7wBoCj5DSr6");
+    const create_project = async e => {
 
-        const project_info = await SdkProject.fetch(connection,project_id);
-        const product_meta = await SdkItemMeta.fetch(connection,product_meta_id);
+        const ix = new ChainSdk(wallet.adapter).createProject();
 
-        const ix = new ChainSdk(wallet.adapter).buyItem(
-            project_id,
-            project_info,
-            product_mint,
-            product_meta,
-        );
-
-        sendTx([ix],"other", []).then((sig) => {
-            console.log('tx sent',sig)
-        }).catch((e) => {
-            console.error('got an error: ',e)
+        sendTx([ix], "system").catch((e) => {
+            toast.error('unable to create project: ' + e.message)
         });
-    }
-
+    };
 
     return (<>
         <Flex w="100%" p="1rem">
             <p className="not-italic text-xl font-bold pl-2">Limited items</p>
             <Spacer />
             <Button colorScheme='teal' size='sm' onClick={onOpen}>
-                new item
-            </Button>
-            <Button colorScheme='teal' size='sm' onClick={buyItem}>
-                Buy static
+                + item
             </Button>
             <Button colorScheme='teal' size='sm' onClick={testTx}>
-                test tx
+                test buy tx
             </Button>
-            <Button colorScheme='teal' size='sm' onClick={create_escrow_payment_account}>
-                +escrow payment acc
-            </Button>
-            <Button colorScheme='teal' size='sm' onClick={create_signer_item_account}>
-                +signer item acc
+            <Button onClick={create_project}>
+                +project
             </Button>
         </Flex>
 
@@ -245,7 +157,7 @@ export default function LimitedItems() {
         <ProgressDialog isOpen={isProgressOpen} />
 
         <TableContainer>
-            <Table variant='striped' >
+            <Table variant='simple' size='sm'>
                 <TableCaption>List of limited items in shop</TableCaption>
                 <Thead>
                     <Tr>
@@ -254,11 +166,14 @@ export default function LimitedItems() {
                         <Th>Mint</Th>
                         <Th isNumeric>Supply</Th>
                         <Th isNumeric>Price</Th>
-                        <Th isNumeric textAlign='end'>Sales</Th>
+                        <Th isNumeric >Sales</Th>
+                        <Th textAlign='end'>Sold</Th>
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {itemsList.map((item) => (<LimitedRowItem key={item.mint} {...item} showCopyOkToast={showCopyOkToast} enableHandler={onActivateItemHandler} />))}
+                    {items.map((item) => (<LimitedRowItem key={item.mint} item={item} onClick={() => {
+                        toast.warn("enable " + item.mint + " not implemented");
+                    }} />))}
                 </Tbody>
 
             </Table>
