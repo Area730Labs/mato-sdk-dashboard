@@ -18,9 +18,10 @@ export interface CreateItemAccounts {
   authority: PublicKey
   mintAuthority: PublicKey
   priceMint: PublicKey
+  paymentTokenAcc: PublicKey
   tokenProgram: PublicKey
-  rentProgram: PublicKey
   systemProgram: PublicKey
+  rent: PublicKey
 }
 
 export const layout = borsh.struct([
@@ -38,9 +39,10 @@ export function createItem(args: CreateItemArgs, accounts: CreateItemAccounts) {
     { pubkey: accounts.authority, isSigner: true, isWritable: true },
     { pubkey: accounts.mintAuthority, isSigner: false, isWritable: true },
     { pubkey: accounts.priceMint, isSigner: false, isWritable: false },
+    { pubkey: accounts.paymentTokenAcc, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
-    { pubkey: accounts.rentProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
+    { pubkey: accounts.rent, isSigner: false, isWritable: false },
   ]
   const identifier = Buffer.from([176, 125, 142, 227, 8, 231, 222, 237])
   const buffer = Buffer.alloc(1000)

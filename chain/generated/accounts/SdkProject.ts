@@ -96,8 +96,6 @@ export class SdkProject {
       throw new Error("invalid account discriminator")
     }
 
-    console.warn("data length is :"+data.length);
-
     const dec = SdkProject.layout.decode(data.slice(8))
 
     return new SdkProject({

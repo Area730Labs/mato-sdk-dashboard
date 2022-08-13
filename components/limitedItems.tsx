@@ -1,42 +1,33 @@
 import {
     Button,
-    ButtonGroup,
     Flex,
     Spacer,
     Table,
     Thead,
     Tbody,
-    Tfoot,
     Tr,
     Th,
-    Td,
     TableCaption,
     TableContainer,
-    Switch,
-    CircularProgress,
-    CircularProgressLabel,
 } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
-import CreateLimitedItemForm, { CreateItemForm } from './createLimitedItemForm';
+import CreateLimitedItemForm, { CreateItemForm, USDC_TOKEN } from './createLimitedItemForm';
 import ProgressDialog from './progressDialog';
 import LimitedRowItem from './limitedItemRow'
 import ChainSdk from '../chain/sdk';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useAppContext } from '../core/appcontext';
-import { Connection, Keypair, Signer, Transaction } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey, Signer, Transaction } from '@solana/web3.js';
 import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes';
 import { useProjectContext } from './projectContext';
 import { toast } from 'react-toastify';
 
 export default function LimitedItems() {
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
 
     const { wallet } = useWallet();
     const { sendTx, connection } = useAppContext();
     const { project: project_id, projectObject, items } = useProjectContext();
-
-    const itemsList = [];
 
     const onDataSave = async (data: CreateItemForm) => {
         onClose();
@@ -88,30 +79,47 @@ export default function LimitedItems() {
     //         console.error('got an error: ',e)
     //     });
     // }
-    // const create_escrow_payment_account = async  => {
+    const create_escrow_payment_account = async => {
 
-    //     const project_uid = new PublicKey("3jMSn7jd6DXGsu55iMus7DApi2AEkiNGRwV16Rqpwhrg");
-    //     const mint = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
+        const ix = new ChainSdk(wallet.adapter).createEscrowTokenAccount(
+            project_id,
+            USDC_TOKEN,
+        );
 
-    //     const ix = new ChainSdk(wallet.adapter).createEscrowTokenAccount(
-    //         project_id,
-    //         mint,
-    //     );
+        sendTx([ix], "system").catch((e) => {
+            console.error('got an error: ', e)
+        });
+    }
 
-    //     sendTx([ix],"other", []).then((sig) => {
-    //         console.log('tx sent',sig)
-    //     }).catch((e) => {
-    //         console.error('got an error: ',e)
-    //     });
-    // }
+    const buy_market = async e => {
+
+        let item = new PublicKey("EfdBSEyJ32PBLsHaCdyESbu1KeuaF3LXGKZSjt7ZPBwH");
+        
+        let txData = await fetch('https://cldfn.com/matosolana/project/' + project_id + '/market/buy/' + item + "/"+wallet.adapter.publicKey.toString());
+        let txJson = await txData.json();
+
+
+        let tx_message_bytes = Buffer.from(txJson.tx, 'base64');
+
+        // let tx_message = Message.from(tx_message_bytes);
+        let tx = Transaction.from(tx_message_bytes);
+
+        let rawtx = tx.serialize({ verifySignatures: false });
+
+        console.warn(bs58.encode(rawtx));
+
+        wallet.adapter.sendTransaction(tx, connection, {
+            skipPreflight: true
+        });
+    }
 
     const testTx = async e => {
 
-        let txData = await fetch('https://cldfn.com/matosolana/buy/D6ipFk7ZmTw8HRRtkKsxKY4zAQCriCkLztZyCERdT41C/1/CUnDxJCbAEtrN9yruSfWx1oD8dFj7os78Rfqe9LHaMDy');
+        let test_mint = items[0].mint;
+      
+        let txData = await fetch('https://cldfn.com/matosolana/buy/' + test_mint + '/1/' + wallet.adapter.publicKey.toString());
         let txJson = await txData.json();
-        let conn = new Connection("https://api.devnet.solana.com");
 
-        // let default_signatue = bs58.encode(Buffer.alloc(64).fill(0));
 
         let tx_message_bytes = Buffer.from(txJson.tx, 'base64');
 
@@ -138,6 +146,33 @@ export default function LimitedItems() {
         });
     };
 
+    const list_item = async e => {
+
+        let mint = new PublicKey("41r8vUjmHuLXvC3VPqkJK9zxcWiFKYz6XtUr2JcFb3Xi");
+
+
+        const url = 'https://cldfn.com/matosolana/project/'+project_id+'/market/list/' + mint + '/' + wallet.adapter.publicKey.toString() + '?price_mint=4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU&price=100000';
+        let txData = await fetch(url);
+
+        console.log('sent request to ',url)
+        let txJson = await txData.json();
+
+
+        let tx_message_bytes = Buffer.from(txJson.tx, 'base64');
+
+        // let tx_message = Message.from(tx_message_bytes);
+        let tx = Transaction.from(tx_message_bytes);
+
+        let rawtx = tx.serialize({ verifySignatures: false });
+
+        console.warn(bs58.encode(rawtx));
+
+        wallet.adapter.sendTransaction(tx, connection, {
+            skipPreflight: true
+        });
+
+    }
+
     return (<>
         <Flex w="100%" p="1rem">
             <p className="not-italic text-xl font-bold pl-2">Limited items</p>
@@ -145,16 +180,25 @@ export default function LimitedItems() {
             <Button colorScheme='teal' size='sm' onClick={onOpen}>
                 + item
             </Button>
+            <Button colorScheme='teal' size='sm' onClick={list_item}>
+                list to market
+            </Button>
+            <Button colorScheme='teal' size='sm' onClick={buy_market}>
+                buy on market
+            </Button>
             <Button colorScheme='teal' size='sm' onClick={testTx}>
                 test buy tx
             </Button>
             <Button onClick={create_project}>
                 +project
             </Button>
+            <Button onClick={create_escrow_payment_account}>
+                +escrow USDC wallet
+            </Button>
+
         </Flex>
 
         <CreateLimitedItemForm isOpen={isOpen} onClose={onClose} onSave={onDataSave} />
-        <ProgressDialog isOpen={isProgressOpen} />
 
         <TableContainer>
             <Table variant='simple' size='sm'>

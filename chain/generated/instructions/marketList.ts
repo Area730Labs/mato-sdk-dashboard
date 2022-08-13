@@ -23,6 +23,7 @@ export interface MarketListAccounts {
   sellerItemTokenAccount: PublicKey
   systemProgram: PublicKey
   tokenProgram: PublicKey
+  rent: PublicKey
 }
 
 export const layout = borsh.struct([
@@ -45,18 +46,15 @@ export function marketList(args: MarketListArgs, accounts: MarketListAccounts) {
       isWritable: true,
     },
     { pubkey: accounts.paymentTokenMint, isSigner: false, isWritable: false },
-    {
-      pubkey: accounts.paymentTokenAccount,
-      isSigner: false,
-      isWritable: false,
-    },
+    { pubkey: accounts.paymentTokenAccount, isSigner: false, isWritable: true },
     {
       pubkey: accounts.sellerItemTokenAccount,
       isSigner: false,
-      isWritable: false,
+      isWritable: true,
     },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
+    { pubkey: accounts.rent, isSigner: false, isWritable: false },
   ]
   const identifier = Buffer.from([153, 21, 165, 25, 43, 65, 123, 52])
   const buffer = Buffer.alloc(1000)

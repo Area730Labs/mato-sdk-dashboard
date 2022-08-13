@@ -10,6 +10,7 @@ import {
 import { SdkProject } from "./generated/accounts";
 import { buyGameItem, BuyGameItemAccounts, BuyGameItemArgs } from "./generated/instructions/buyGameItem";
 import { SdkItemMeta } from "./generated/accounts/SdkItemMeta";
+import { marketList, MarketListAccounts, MarketListArgs } from "./generated/instructions";
 
 class ChainSdk {
 
@@ -108,7 +109,9 @@ class ChainSdk {
             itemId: id
         };
 
-        let escrow_account_old = calcAddressWithSeed("escrow", project.uid);
+        let payment_acc = findAssociatedTokenAddress(escrow_account[0],price_mint);
+        // calcAddressWithTwoSeeds("payment_acc",escrow_account[0].toBuffer(),price_mint);
+
 
         // todo: add project authority
         const ixAccounts: CreateItemAccounts = {
@@ -119,12 +122,58 @@ class ChainSdk {
             authority: this.signer.publicKey,
             priceMint: price_mint,
             tokenProgram: TOKEN_PROGRAM_ID,
-            rentProgram: SYSVAR_RENT_PUBKEY,
             systemProgram: SystemProgram.programId,
-            mintAuthority: escrow_account[0]
+            mintAuthority: escrow_account[0],
+            paymentTokenAcc: payment_acc,
+            rent: SYSVAR_RENT_PUBKEY
         };
 
         return createItem(ixArgs, ixAccounts);
+    }
+
+
+    marketSellItem(
+        project_address: PublicKey,
+        mint : PublicKey,
+        sell_amount: number,
+        price_total: number, 
+        price_mint: PublicKey,
+    ) {
+
+        let market_escrow = calcAddressWithSeed("market_escrow", project_address);
+        let meta = calcAddressWithSeed("meta", mint);
+        let listing_address = calcAddressWithTwoSeeds("listing",mint.toBuffer(),this.signer.publicKey);
+        let market_escrow_tokenacc = calcAddressWithSeed("listing_tacc", listing_address[0]);
+
+        let seller_payment_acc = findAssociatedTokenAddress(this.signer.publicKey,price_mint);
+        let seller_item_acc = findAssociatedTokenAddress(this.signer.publicKey,mint);
+
+
+        const ixArgs: MarketListArgs = {
+            totalPrice: new BN(price_total),
+            amount: new BN(sell_amount),
+            expireAt: new BN(0)
+        };
+
+
+        // todo: add project authority
+        const ixAccounts: MarketListAccounts = {
+            project: project_address,
+            mint: mint,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+            seller: this.signer.publicKey,
+            mintMeta: meta[0],
+            listingInfo: listing_address[0],
+            marketEscrow: market_escrow[0],
+            marketEscrowTokenAccount: market_escrow_tokenacc[0],
+            paymentTokenMint: price_mint,
+            paymentTokenAccount: seller_payment_acc,
+            sellerItemTokenAccount: seller_item_acc,
+            rent: SYSVAR_RENT_PUBKEY
+        };
+
+        return marketList(ixArgs, ixAccounts);
     }
 
     createProject() {
