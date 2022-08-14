@@ -4,6 +4,8 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Box, Flex, Spinner, Text } from '@chakra-ui/react'
 import React from "react";
+import Lottie from 'react-lottie-player'
+import animation from "../public/animation.json"
 
 export default function Login() {
 
@@ -23,6 +25,14 @@ export default function Login() {
         textAlign="center"
       >
         <Text marginTop="25px" fontSize='xl' fontWeight="bold">MatoLabs</Text>
+        <Box textAlign="center" marginLeft="20px">
+          <Lottie
+            loop
+            animationData={animation}
+            play
+            style={{ width: 500, height: 500 }}
+          />
+        </Box>
       </Box>
       <Box
         display={"flex"}
@@ -50,7 +60,7 @@ export default function Login() {
                   Connect your solana wallet to start
                 </Text>
                 <p className={styles.description}>
-                  <WalletMultiButton style={{color:"black"}} />
+                  <WalletMultiButton style={{ color: "black" }} />
                 </p>
               </>
             )}
