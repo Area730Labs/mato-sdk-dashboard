@@ -29,7 +29,9 @@ function App({ Component, pageProps }) {
       display="flex"
       width="100%"
       minHeight="100%"
-      alignItems={"center"}
+      alignItems="center"
+      position="relative"
+      height="100vh"
     >
       <ChakraProvider>
         <ConnectionProvider endpoint={endpoint}>
@@ -44,11 +46,10 @@ function App({ Component, pageProps }) {
                   borderRadius="24px"
                   backgroundColor={"white"}
                   boxShadow="xl"
-                  minH={"620px"}
+                  minH={"660px"}
                   alignContent="stretch"
                   marginTop={"16px"}
                   marginBottom={"16px"}
-                  height="700px"
                 >
                   <Component {...pageProps} />
                 </Container>

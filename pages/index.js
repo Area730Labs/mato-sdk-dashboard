@@ -17,7 +17,7 @@ export default function Home() {
   const { authorized } = useAppContext();
 
   return (authorized ? <PageWrapper>
-    <Dashboard />
+    <Dashboard alignContent="stretch" />
   </PageWrapper> : <Login />
   )
 }

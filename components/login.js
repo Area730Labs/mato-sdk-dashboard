@@ -14,39 +14,44 @@ export default function Login() {
 
   let inProgress = connecting || publicKey;
 
+  const leftWitdth = {base: "100%", sm: "40%"};
+  const rightWitdth = {base: "100%", sm: "60%"};
+
+
   return (
     <>
       <Box
         display={"flex"}
         flexDirection="column"
-        width="50%"
-        height={"100%"}
+        width={leftWitdth}
         backgroundColor={"rgb(243 244 246)"}
         textAlign="center"
       >
         <Text marginTop="25px" fontSize='xl' fontWeight="bold">MatoLabs</Text>
-        <Box textAlign="center" marginLeft="20px">
+        <Box textAlign="center" marginLeft="50px">
           <Lottie
             loop
             animationData={animation}
             play
-            style={{ width: 500, height: 500 }}
+            style={{ width: 400, height: 400 }}
           />
         </Box>
       </Box>
       <Box
         display={"flex"}
         flexDirection="column"
-        width="50%"
+        width={rightWitdth}
+        alignSelf="center"
       >
-        <div className={styles.container}>
+        <div className={styles.container} alignSelf="stretch">
+         {/* wrong place for this, no  */}
           <Head>
             <title>Mato SDK</title>
             <meta name="description" content="Mato SDK dashboard" />
             <link rel="icon" href="/favicon.ico" />
           </Head>
 
-          <main className={styles.main}>
+          <Box className={styles.main}>
             {inProgress && (
               <>
                 <Spinner size='lg' color='green.400' />
@@ -60,11 +65,11 @@ export default function Login() {
                   Connect your solana wallet to start
                 </Text>
                 <p className={styles.description}>
-                  <WalletMultiButton style={{ color: "black" }} />
+                  <WalletMultiButton style={{ width: "100%" }} />
                 </p>
               </>
             )}
-          </main>
+          </Box>
         </div>
       </Box>
     </>

@@ -4,7 +4,7 @@ import Charts from './charts';
 import LimitedItems from './limitedItems';
 import { Badge, Box, Flex, List, ListItem, Text } from "@chakra-ui/react";
 
-export default function Dashboard() {
+export default function Dashboard(props) {
     const { disconnect, publicKey, wallet } = useWallet();
 
     let [tab, setTab] = useState('limited-items');
@@ -55,9 +55,9 @@ export default function Dashboard() {
     const currentContent = menuItems.find(x => x.loc == tab);
     const Content = currentContent.component;
 
-    return (<Box display="flex" borderRadius="24px" overflow="hidden">
+    return (<Box display="flex"  overflow="hidden">
         <Flex ariaLabel="Sidebar" flexDir="column">
-            <Box backgroundColor="rgb(243 244 246)" h="100%">
+            <Box backgroundColor="rgb(243 244 246)"  height="100%">
                 <Text marginY="15px" fontSize='xl' fontWeight="bold" textAlign={"left"} paddingLeft={6}>MatoLabs</Text>
                 <List>
                     {menuItems.map(({ loc, title, btnAction, styles, ...rest }) => {
@@ -75,16 +75,16 @@ export default function Dashboard() {
                             bgColor={bgColor}
                         >
                             <a href="#" onClick={btnAction}>
-                                <span>{title} {rest.badge}</span>
+                                <span> {rest.badge} {title}</span>
                             </a>
                         </ListItem>
                     })}
                 </List>
             </Box>
         </Flex>
-        <div className="overflow-x-auto relative flex flex-col w-full">
+        <Box>
             <Content />
-        </div>
+        </Box>
     </Box>
     );
 }
