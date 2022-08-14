@@ -19,7 +19,6 @@ export interface MarketListAccounts {
   marketEscrow: PublicKey
   marketEscrowTokenAccount: PublicKey
   paymentTokenMint: PublicKey
-  paymentTokenAccount: PublicKey
   sellerItemTokenAccount: PublicKey
   systemProgram: PublicKey
   tokenProgram: PublicKey
@@ -46,7 +45,6 @@ export function marketList(args: MarketListArgs, accounts: MarketListAccounts) {
       isWritable: true,
     },
     { pubkey: accounts.paymentTokenMint, isSigner: false, isWritable: false },
-    { pubkey: accounts.paymentTokenAccount, isSigner: false, isWritable: true },
     {
       pubkey: accounts.sellerItemTokenAccount,
       isSigner: false,

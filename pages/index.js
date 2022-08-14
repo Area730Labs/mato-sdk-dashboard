@@ -9,9 +9,7 @@ function PageWrapper({ children }) {
   const project_id = new PublicKey("AQg9Cr7YpapTeu9YmfVTz1Rh1NTDCVbwEidqhnNnHRMz");
 
   return <ProjectContextProvider project={project_id}>
-    <div class="container w-4/5 mx-auto">
       {children ?? null}
-    </div>
   </ProjectContextProvider>
 }
 

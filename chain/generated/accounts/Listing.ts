@@ -12,7 +12,6 @@ export interface ListingFields {
   salePriceTotal: BN
   saleExpireAt: BN
   paymentTokenMint: PublicKey
-  sellerPaymentTokenAccount: PublicKey
   marketEscrowTokenAccount: PublicKey
 }
 
@@ -24,7 +23,6 @@ export interface ListingJSON {
   salePriceTotal: string
   saleExpireAt: string
   paymentTokenMint: string
-  sellerPaymentTokenAccount: string
   marketEscrowTokenAccount: string
 }
 
@@ -36,7 +34,6 @@ export class Listing {
   readonly salePriceTotal: BN
   readonly saleExpireAt: BN
   readonly paymentTokenMint: PublicKey
-  readonly sellerPaymentTokenAccount: PublicKey
   readonly marketEscrowTokenAccount: PublicKey
 
   static readonly discriminator = Buffer.from([
@@ -51,7 +48,6 @@ export class Listing {
     borsh.u64("salePriceTotal"),
     borsh.u64("saleExpireAt"),
     borsh.publicKey("paymentTokenMint"),
-    borsh.publicKey("sellerPaymentTokenAccount"),
     borsh.publicKey("marketEscrowTokenAccount"),
   ])
 
@@ -63,7 +59,6 @@ export class Listing {
     this.salePriceTotal = fields.salePriceTotal
     this.saleExpireAt = fields.saleExpireAt
     this.paymentTokenMint = fields.paymentTokenMint
-    this.sellerPaymentTokenAccount = fields.sellerPaymentTokenAccount
     this.marketEscrowTokenAccount = fields.marketEscrowTokenAccount
   }
 
@@ -116,7 +111,6 @@ export class Listing {
       salePriceTotal: dec.salePriceTotal,
       saleExpireAt: dec.saleExpireAt,
       paymentTokenMint: dec.paymentTokenMint,
-      sellerPaymentTokenAccount: dec.sellerPaymentTokenAccount,
       marketEscrowTokenAccount: dec.marketEscrowTokenAccount,
     })
   }
@@ -130,7 +124,6 @@ export class Listing {
       salePriceTotal: this.salePriceTotal.toString(),
       saleExpireAt: this.saleExpireAt.toString(),
       paymentTokenMint: this.paymentTokenMint.toString(),
-      sellerPaymentTokenAccount: this.sellerPaymentTokenAccount.toString(),
       marketEscrowTokenAccount: this.marketEscrowTokenAccount.toString(),
     }
   }
@@ -144,7 +137,6 @@ export class Listing {
       salePriceTotal: new BN(obj.salePriceTotal),
       saleExpireAt: new BN(obj.saleExpireAt),
       paymentTokenMint: new PublicKey(obj.paymentTokenMint),
-      sellerPaymentTokenAccount: new PublicKey(obj.sellerPaymentTokenAccount),
       marketEscrowTokenAccount: new PublicKey(obj.marketEscrowTokenAccount),
     })
   }

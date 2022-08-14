@@ -21,6 +21,7 @@ import { Connection, Keypair, PublicKey, Signer, Transaction } from '@solana/web
 import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes';
 import { useProjectContext } from './projectContext';
 import { toast } from 'react-toastify';
+import { Listing } from '../chain/generated/accounts/Listing';
 
 export default function LimitedItems() {
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -93,8 +94,12 @@ export default function LimitedItems() {
 
     const buy_market = async e => {
 
-        let item = new PublicKey("EfdBSEyJ32PBLsHaCdyESbu1KeuaF3LXGKZSjt7ZPBwH");
-        
+        let item = new PublicKey("7aD2mfnGR5Fu7i36gmns3VFSf33qVdMpYAUGUWfNY8Y8");
+
+        let listingInfo = await Listing.fetch(connection,item);
+
+        console.warn('listing info ',listingInfo.toJSON())
+
         let txData = await fetch('https://cldfn.com/matosolana/project/' + project_id + '/market/buy/' + item + "/"+wallet.adapter.publicKey.toString());
         let txJson = await txData.json();
 

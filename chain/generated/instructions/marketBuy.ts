@@ -48,7 +48,7 @@ export function marketBuy(accounts: MarketBuyAccounts) {
       isSigner: false,
       isWritable: true,
     },
-    { pubkey: accounts.tokenProgram, isSigner: false, isWritable: true },
+    { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
   ]
   const identifier = Buffer.from([90, 236, 106, 220, 221, 81, 108, 140])
   const data = identifier

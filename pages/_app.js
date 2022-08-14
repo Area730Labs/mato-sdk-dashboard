@@ -3,8 +3,8 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
-import {useMemo} from 'react'
-import { ChakraProvider } from '@chakra-ui/react'
+import { useMemo } from 'react'
+import { Box, ChakraProvider, Container } from '@chakra-ui/react'
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 import '../styles/globals.css'
@@ -17,26 +17,48 @@ function App({ Component, pageProps }) {
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
   const wallets = useMemo(
-      () => [
-          new SolflareWalletAdapter(),
-          new PhantomWalletAdapter(),
-      ],
-      []
+    () => [
+      new SolflareWalletAdapter(),
+      new PhantomWalletAdapter(),
+    ],
+    []
   );
 
-  return(
+  return (
+    <Box
+      display="flex"
+      width="100%"
+      minHeight="100%"
+      alignItems={"center"}
+    >
       <ChakraProvider>
         <ConnectionProvider endpoint={endpoint}>
-            <WalletProvider wallets={wallets} >
-                <WalletModalProvider>
-                  <AppProvider>
-                      <Component {...pageProps} />
-                  </AppProvider>
-                </WalletModalProvider>
-            </WalletProvider>
+          <WalletProvider wallets={wallets} >
+            <WalletModalProvider>
+              <AppProvider>
+                <Container
+                  padding={0}
+                  overflow="hidden"
+                  display={"flex"}
+                  maxW='container.lg'
+                  borderRadius="24px"
+                  backgroundColor={"white"}
+                  boxShadow="xl"
+                  minH={"620px"}
+                  alignContent="stretch"
+                  marginTop={"16px"}
+                  marginBottom={"16px"}
+                  height="700px"
+                >
+                  <Component {...pageProps} />
+                </Container>
+              </AppProvider>
+            </WalletModalProvider>
+          </WalletProvider>
         </ConnectionProvider>
         <ToastContainer position='bottom-right' />
       </ChakraProvider>
+    </Box>
   );
 }
 

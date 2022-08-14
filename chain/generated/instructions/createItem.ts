@@ -39,7 +39,7 @@ export function createItem(args: CreateItemArgs, accounts: CreateItemAccounts) {
     { pubkey: accounts.authority, isSigner: true, isWritable: true },
     { pubkey: accounts.mintAuthority, isSigner: false, isWritable: true },
     { pubkey: accounts.priceMint, isSigner: false, isWritable: false },
-    { pubkey: accounts.paymentTokenAcc, isSigner: false, isWritable: true },
+    { pubkey: accounts.paymentTokenAcc, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.rent, isSigner: false, isWritable: false },

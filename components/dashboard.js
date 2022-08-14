@@ -52,7 +52,7 @@ export default function Dashboard() {
     const currentContent = menuItems.find(x => x.loc == tab);
     const Content = currentContent.component;
 
-    return (<main className='flex'>
+    return (<main className='flex rounded-l-3xl overflow overflow-hidden'>
             <aside className="w-64 h-full" aria-label="Sidebar">
                 <div className="overflow-y-auto py-4 px-3 bg-gray-50 rounded h-full">
                     <p className="flex items-center pl-2.5 mb-5">

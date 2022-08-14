@@ -46,11 +46,6 @@
           "isSigner": false
         },
         {
-          "name": "paymentTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "sellerItemTokenAccount",
           "isMut": true,
           "isSigner": false
@@ -146,7 +141,7 @@
         },
         {
           "name": "tokenProgram",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -302,16 +297,11 @@
         },
         {
           "name": "paymentTokenAcc",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "rentProgram",
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -467,10 +457,6 @@
           },
           {
             "name": "paymentTokenMint",
-            "type": "publicKey"
-          },
-          {
-            "name": "sellerPaymentTokenAccount",
             "type": "publicKey"
           },
           {
