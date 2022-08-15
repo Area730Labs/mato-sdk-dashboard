@@ -1,39 +1,56 @@
-import { 
+import { CopyIcon } from '@chakra-ui/icons';
+import {
     Tr,
     Td,
     Switch,
     CircularProgress,
     CircularProgressLabel,
+    SystemProps,
 } from '@chakra-ui/react'
 import Image from 'next/image'
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { SdkItem } from '../api/api';
 
 
+export interface LimitedRowItemProps extends SystemProps {
+    /**
+     * Aligns the cell content to the right
+     */
+    item: SdkItem;
+    disabled?: boolean,
+}
 
-export default function LimitedRowItem(props : {item: SdkItem})  {
 
-    let {item,...restprops} = props;
+export default function LimitedRowItem(props: LimitedRowItemProps) {
+
+
+    let { item, ...restprops } = props;
+    let [enabled,setEnabled] = useState(!item.inactive);
 
     const showCopyOkToast = () => {
         toast.info('copied to clipboard');
-    } 
+    }
 
-    const soldPercent = (item.sold/item.supply)*100;
-
+    const soldPercent = Math.round((item.sold / item.supply) * 100);
+    const toggleActive = () => {
+        setEnabled(!enabled);
+    }
 
     return (
         <Tr {...restprops}>
-            {/* <Td textAlign='center'><Switch id='email-alerts' colorScheme='green' isChecked={props.active} name={props.mint} onChange={props.enableHandler} /></Td> */}
+            <Td textAlign='center'>
+                <Switch colorScheme='green' isChecked={enabled} onChange={toggleActive} />
+            </Td>
             <Td>{item.uid}</Td>
             <Td>
-                {item.mint.substring(0, 6)}...
+                {item.mint.substring(0, 8)}...
                 <a href="#" onClick={(e) => {
                     e.stopPropagation()
                     navigator.clipboard.writeText(item.mint);
                     showCopyOkToast();
                 }}>
-                    <Image src="/copyIcon.svg" alt="Logo" className="mr-3 h-6 sm:h-7" width={22} height={22} color='gray.100'/>
+                    <CopyIcon />
                 </a>
             </Td>
             <Td isNumeric>{item.supply.toString().toLocaleString()}</Td>

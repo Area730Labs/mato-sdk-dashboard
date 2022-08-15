@@ -16,6 +16,7 @@ export interface SdkItem {
     price_mint: string
     created_at: string
     last_sold: string
+    inactive: boolean
 }
 
 class Api {

@@ -12,12 +12,11 @@ import {
 } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
 import CreateLimitedItemForm, { CreateItemForm, USDC_TOKEN } from './createLimitedItemForm';
-import ProgressDialog from './progressDialog';
 import LimitedRowItem from './limitedItemRow'
 import ChainSdk from '../chain/sdk';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useAppContext } from '../core/appcontext';
-import { Connection, Keypair, PublicKey, Signer, Transaction } from '@solana/web3.js';
+import { Keypair, PublicKey, Signer, Transaction } from '@solana/web3.js';
 import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes';
 import { useProjectContext } from './projectContext';
 import { toast } from 'react-toastify';
@@ -206,11 +205,11 @@ export default function LimitedItems() {
         <CreateLimitedItemForm isOpen={isOpen} onClose={onClose} onSave={onDataSave} />
 
         <TableContainer>
-            <Table variant='simple' size='sm'>
+            <Table variant='striped' size='sm'>
                 <TableCaption>List of limited items in shop</TableCaption>
                 <Thead>
                     <Tr>
-                        {/* <Th textAlign='center' width='0em'>Enabled</Th> */}
+                        <Th textAlign='center' width='0em'>Active</Th>
                         <Th>Game UID</Th>
                         <Th>Mint</Th>
                         <Th isNumeric>Supply</Th>
@@ -220,9 +219,7 @@ export default function LimitedItems() {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {items.map((item) => (<LimitedRowItem key={item.mint} item={item} onClick={() => {
-                        toast.warn("enable " + item.mint + " not implemented");
-                    }} />))}
+                    {items.map((item) => (<LimitedRowItem key={item.mint} item={item}  />))}
                 </Tbody>
 
             </Table>

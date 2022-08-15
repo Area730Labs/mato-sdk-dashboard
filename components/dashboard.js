@@ -4,6 +4,10 @@ import Charts from './charts';
 import LimitedItems from './limitedItems';
 import { Badge, Box, Flex, List, ListItem, Text } from "@chakra-ui/react";
 
+function EmptyPage() {
+    return <></>
+}
+
 export default function Dashboard(props) {
     const { disconnect, publicKey, wallet } = useWallet();
 
@@ -28,16 +32,16 @@ export default function Dashboard(props) {
 
             loc: 'nfts',
             btnAction: () => setTab('nfts'),
-            component: null,
-            badge: <Badge variant='solid' colorScheme='green'>Soon</Badge>
+            component: EmptyPage,
+            badge: <Badge variant='outline' >Soon</Badge>
         },
         {
             title: 'Tokens',
 
             loc: 'tokens',
             btnAction: () => setTab('tokens'),
-            component: null,
-            badge: <Badge variant='solid' colorScheme='green' alignSelf={"end"}>Soon</Badge>
+            component: EmptyPage,
+            badge: <Badge  variant='outline'>Soon</Badge>
         },
         {
             title: 'Sign Out (' + publicKey.toString().substring(0, 6) + '...)',
@@ -48,16 +52,16 @@ export default function Dashboard(props) {
                 disconnect().catch(() => { });
                 console.log('log out');
             },
-            component: null,
+            component: EmptyPage,
         }
     ];
 
     const currentContent = menuItems.find(x => x.loc == tab);
     const Content = currentContent.component;
 
-    return (<Box display="flex"  overflow="hidden">
+    return (<Box display="flex" overflow="hidden">
         <Flex ariaLabel="Sidebar" flexDir="column" width="220px">
-            <Box backgroundColor="rgb(243 244 246)"  height="100%">
+            <Box backgroundColor="rgb(243 244 246)" height="100%">
                 <Text marginY="15px" fontSize='xl' fontWeight="bold" textAlign={"left"} paddingLeft={6}>MatoLabs</Text>
                 <List>
                     {menuItems.map(({ loc, title, btnAction, styles, ...rest }) => {
@@ -73,16 +77,17 @@ export default function Dashboard(props) {
                             display="flex"
                             fontSize="sm"
                             bgColor={bgColor}
+                            onClick={btnAction}
                         >
-                            <a href="#" onClick={btnAction}>
-                                <span> {rest.badge} {title}</span>
+                            <a href="#" >
+                                <span>{rest.badge} {title}</span>
                             </a>
                         </ListItem>
                     })}
                 </List>
             </Box>
         </Flex>
-        <Box>
+        <Box padding="4">
             <Content />
         </Box>
     </Box>
