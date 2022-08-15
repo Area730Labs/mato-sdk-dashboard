@@ -85,14 +85,6 @@ export default function Dashboard(props) {
             badge: <Badge variant='outline' >Soon</Badge>
         },
         {
-            title: 'Tokens',
-
-            loc: 'tokens',
-            btnAction: () => setTab('tokens'),
-            component: EmptyPage,
-            badge: <Badge variant='outline'>Soon</Badge>
-        },
-        {
             title: 'Earnings',
 
             loc: 'earnings',
@@ -120,7 +112,7 @@ export default function Dashboard(props) {
     const Content = currentContent.component;
 
     return (<Box display="flex" overflow="hidden">
-        <Flex ariaLabel="Sidebar" flexDir="column" width="220px">
+        <Flex flexDir="column" width="220px">
             <Box backgroundColor="rgb(243 244 246)" height="100%" display="flex" flexDirection="column">
                 <Box padding={outerPadding}>
                     <Text marginY="15px" fontSize='xl' fontWeight="bold" textAlign={"left"} paddingLeft={paddingLeft}>MatoLabs</Text>
@@ -129,7 +121,7 @@ export default function Dashboard(props) {
                 <List padding={outerPadding} >
                     {menuItems.map(item =>
                         item.skip_main ? null :
-                        <CompiledMenuItem item={item} tab={tab} />
+                        <CompiledMenuItem key={item.loc} item={item} tab={tab} />
                     )}
                 </List>
                 <List padding={outerPadding} justifySelf="stretch" marginBottom="10px" marginTop="auto" >
@@ -137,12 +129,14 @@ export default function Dashboard(props) {
                         item={settingButton}
                         tab={tab}
                         textAlign="left"
+                        key={settingButton.loc}
                     />
                     <ListItem marginY="2" paddingLeft={paddingLeft} fontSize="xs" textAlign="left" color="rgb(118 118 118)"><Address addr={publicKey} /></ListItem>
                     <CompiledMenuItem
                         item={signOutButton}
                         tab={tab}
                         textAlign="left"
+                        key={signOutButton.loc}
                     >
                         <LockIcon />
                     </CompiledMenuItem >

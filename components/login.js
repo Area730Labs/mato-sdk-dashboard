@@ -7,6 +7,7 @@ import React from "react";
 import Lottie from 'react-lottie-player'
 import animation from "../public/animation.json"
 import { PlusSquareIcon, RepeatIcon } from '@chakra-ui/icons';
+import { AuthorizeState, useAppContext } from '../core/appcontext';
 
 function Stats(props) {
 
@@ -29,13 +30,13 @@ function Stats(props) {
 export default function Login() {
 
   const { connecting, publicKey } = useWallet();
-  const msg = publicKey ? 'Fetching data...' : 'Connecting wallet...';
+  const {authorizeState} = useAppContext();
 
-  let inProgress = connecting || publicKey;
+  const msg = publicKey ? 'Sign a message in wallet to authorize' : 'Connecting wallet...';
 
-  const sidebarLength = inProgress ? "220px" : "40%";
+  let inProgress = authorizeState != AuthorizeState.rejected && (connecting || publicKey);
 
-  const leftWitdth = { base: "100%", sm: sidebarLength };
+  const leftWitdth = { base: "100%", sm: "40%" };
   const rightWitdth = { base: "100%", sm: "60%" };
 
   return (

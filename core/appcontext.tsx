@@ -9,13 +9,22 @@ import global_config from "./config";
 import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes/index";
 import { v4 as uuidv4 } from 'uuid';
 import { useWallet } from '@solana/wallet-adapter-react';
+import Api from "../api/api";
 
-export type TransactionType = "system" | "platform"| "other"
+export type TransactionType = "system" | "platform" | "other"
 export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
+
+export enum AuthorizeState {
+    initial,
+    authorizing,
+    rejected,
+    authorized
+}
 
 export interface AppContextType {
 
-    authorized: boolean
+    authorizeState: AuthorizeState,
+    authorized: boolean | null
     // solana 
     solanaConnection: SolanaRpc
     setSolanaNode: any
@@ -41,17 +50,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     // const [lang, setLang] = useState<Lang>(getLanguageFromCache());
     const [solanaNode, setSolanaNode] = useState<string>(global_config.cluster_url)
-    const [connectedWallet, setWallet] = useState<WalletAdapter| null>(null);
+    const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);
 
     const [curtx, setCurtx] = useState<CurrentTx | null>(null);
     const [userUpdatesCounter, setUserUpdatesCounter] = useState(0);
 
     const [rpcQueue, setRpcQueue] = useState<QueuedRpcRequest[]>([]);
-    const [lastRpcRequest,setLastRpcRequestTime] = useState<number>(0);
+    const [lastRpcRequest, setLastRpcRequestTime] = useState<number>(0);
     const [queueProcessorStarted, setStarted] = useState(false);
 
-    const { publicKey,signMessage, connected,wallet } = useWallet();
-    const [authorized, setAuthorized] = useState(false);
+    const { publicKey, signMessage, connected, wallet } = useWallet();
+    const [authorized, setAuthorized] = useState<boolean>(false);
+
+    const [authorizeState, setAuthorizedState] = useState<AuthorizeState>(AuthorizeState.initial);
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, {
@@ -64,31 +75,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         if (connected) {
 
-          setWallet(wallet.adapter);
-    
-          let guid = uuidv4();
-          let bytes = new TextEncoder().encode('authorize request; '+guid);
-    
-          signMessage(bytes).then((signed) => {
-    
-            let sig = bs58.encode(signed);
-           
-            let request = {
-              guid,
-              signature: sig,
-              wallet: publicKey.toString()
-            }
-    
-            setAuthorized(true);
-            console.warn('signed a message', request)
-          
-          }).catch((e) => {
-             console.error('rejected message sign', e.message)
-          });
+            setAuthorizedState(AuthorizeState.authorizing);
+
+            setWallet(wallet.adapter);
+
+            const timestamp = Math.floor(new Date().getTime()/1000);
+
+            let guid = uuidv4();
+            let bytes = new TextEncoder().encode('authorize request; ' + guid+"; "+timestamp);
+
+            signMessage(bytes).then((signed) => {
+
+                let sig = bs58.encode(signed);
+
+                let request = {
+                    guid,
+                    signature: sig,
+                    wallet: publicKey.toString(),
+                    timestamp
+                }
+
+                setAuthorized(true);
+
+                let walletProjects = new Api(web3.SystemProgram.programId)
+                    .wallet_projects("http://localhost:8051/",request);
+
+                console.warn('signed a message', request)
+                setAuthorizedState(AuthorizeState.authorized);
+
+            }).catch((e) => {
+                setAuthorizedState(AuthorizeState.rejected);
+            });
         } else {
             setWallet(null);
         }
-      },[connected]);
+    }, [connected]);
 
     // useEffect(() => {
 
@@ -144,29 +165,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 (async () => {
 
                     for (; ;) {
-    
+
                         let task = rpcQueue.shift();
-    
+
                         if (task != null) {
                             setRpcQueue(rpcQueue);
-                            execRpcTask(web3Handler,task);
+                            execRpcTask(web3Handler, task);
                         }
-    
-    
-                        if (rpcQueue.length > 0 ) {
+
+
+                        if (rpcQueue.length > 0) {
                             await sleep(global_config.rpc_request_interval);
                         } else {
                             break;
                         }
                     }
-    
+
                     resolve(true);
                     promiseResolved = true;
                     setStarted(false);
                 })();
             });
 
-            setTimeout(function() {
+            setTimeout(function () {
                 if (!promiseResolved) {
                     toast.promise(queueuPromise, {
                         pending: 'loading',
@@ -182,9 +203,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
                         hideProgressBar: false,
                     } as ToastOptions);
                 }
-            },800);
+            }, 800);
 
-        } 
+        }
     }, [web3Handler, lastRpcRequest]);
 
 
@@ -233,7 +254,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
                     //     setUserUpdatesCounter(userUpdatesCounter + 1);
                     //     break;
                     // }
-                    case 'system':{
+                    case 'system': {
                         break;
                     }
                     default: {
@@ -306,9 +327,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
 
     const memoedValue = useMemo(() => {
-        const curCtx:AppContextType = {
+        const curCtx: AppContextType = {
 
             authorized,
+            authorizeState,
 
             // wallet
             solanaConnection: rpc_wrapper,
@@ -323,12 +345,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
             // lang,
             // setLang,
             connection: web3Handler
-        } ;
+        };
 
         return curCtx
 
     }, [,
-        authorized,
+        authorized, authorizeState,
         rpc_wrapper, connectedWallet,
         curtx, userUpdatesCounter,
         // lang, 

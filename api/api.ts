@@ -37,6 +37,19 @@ class Api {
         return result.items;
     }
 
+    async wallet_projects(host:string, sig): Promise<any[]> {
+
+        let old_host = this.host;
+        this.host = host;
+
+        let result = await this.sendRequest("get", `projects?args=`+JSON.stringify(sig));
+
+        this.host = old_host;
+
+        return result.items;
+    }
+
+
     private async sendRequest(rm: Method, method: string, args?: any): Promise<any> {
 
         const url = this.host + method
