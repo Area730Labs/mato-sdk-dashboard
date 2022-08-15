@@ -53,6 +53,15 @@ export default function Dashboard(props) {
 
     let [tab, setTab] = useState('limited-items');
 
+    const settingButton = {
+        title: 'Settings',
+        loc: 'settings',
+        btnAction: () => setTab('settings'),
+        component: EmptyPage,
+        skip_main: true
+    };
+    
+
     const menuItems = [
         {
             title: 'Dashboard',
@@ -89,14 +98,14 @@ export default function Dashboard(props) {
             loc: 'earnings',
             btnAction: () => setTab('earnings'),
             component: EmptyPage,
-        }
+        },
+        settingButton
     ];
+
 
     const signOutButton = {
         title: 'Sign Out',
         loc: 'sign-out',
-
-        styles: "font-bold",
         btnAction: () => {
             disconnect().catch(() => { });
             console.log('log out');
@@ -106,6 +115,8 @@ export default function Dashboard(props) {
 
     const paddingLeft = 6;
     const outerPadding = 4;
+
+    console.warn('tab choosen: ',tab);
 
     const currentContent = menuItems.find(x => x.loc == tab);
     const Content = currentContent.component;
@@ -119,11 +130,17 @@ export default function Dashboard(props) {
 
                 <List padding={outerPadding} >
                     {menuItems.map(item =>
+                        item.skip_main ? null :
                         <CompiledMenuItem item={item} tab={tab} />
                     )}
                 </List>
                 <List padding={outerPadding} justifySelf="stretch" marginBottom="10px" marginTop="auto" >
-                    <ListItem paddingLeft={paddingLeft} fontSize="xs" textAlign="left" color="rgb(118 118 118)"><Address addr={publicKey} /></ListItem>
+                    <CompiledMenuItem
+                        item={settingButton}
+                        tab={tab}
+                        textAlign="left"
+                    />
+                    <ListItem marginY="2" paddingLeft={paddingLeft} fontSize="xs" textAlign="left" color="rgb(118 118 118)"><Address addr={publicKey} /></ListItem>
                     <CompiledMenuItem
                         item={signOutButton}
                         tab={tab}
