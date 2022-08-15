@@ -56,7 +56,7 @@ export default function Dashboard(props) {
     const Content = currentContent.component;
 
     return (<Box display="flex"  overflow="hidden">
-        <Flex ariaLabel="Sidebar" flexDir="column">
+        <Flex ariaLabel="Sidebar" flexDir="column" width="220px">
             <Box backgroundColor="rgb(243 244 246)"  height="100%">
                 <Text marginY="15px" fontSize='xl' fontWeight="bold" textAlign={"left"} paddingLeft={6}>MatoLabs</Text>
                 <List>

@@ -2,10 +2,29 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Box, Flex, Spinner, Text } from '@chakra-ui/react'
+import { Box, Flex, Spinner, Text, Tooltip } from '@chakra-ui/react'
 import React from "react";
 import Lottie from 'react-lottie-player'
 import animation from "../public/animation.json"
+import { PlusSquareIcon, RepeatIcon } from '@chakra-ui/icons';
+
+function Stats(props) {
+
+  const { label, value, children, ...rest } = props;
+
+  return <Flex direction="row" alignItems="center" {...rest}>
+    <Box
+      fontSize="xl"
+      fontWeight="bold"
+    >
+      {children}
+    </Box>
+    <Box paddingLeft="15px" textAlign="left" >
+      <Box fontSize="sm" color="gray"  >{props.label}</Box>
+      <Box fontSize="sm" fontWeight="bold">{parseInt(props.value).toLocaleString()}</Box>
+    </Box>
+  </Flex>
+}
 
 export default function Login() {
 
@@ -14,9 +33,10 @@ export default function Login() {
 
   let inProgress = connecting || publicKey;
 
-  const leftWitdth = {base: "100%", sm: "40%"};
-  const rightWitdth = {base: "100%", sm: "60%"};
+  const sidebarLength = inProgress ? "220px" : "40%";
 
+  const leftWitdth = { base: "100%", sm: sidebarLength };
+  const rightWitdth = { base: "100%", sm: "60%" };
 
   return (
     <>
@@ -26,8 +46,9 @@ export default function Login() {
         width={leftWitdth}
         backgroundColor={"rgb(243 244 246)"}
         textAlign="center"
+        transition="all .2s ease"
       >
-        <Text marginTop="25px" fontSize='xl' fontWeight="bold">MatoLabs</Text>
+        <Text marginTop="25px" fontSize='xl' fontWeight="bold">MatoLabs dashboard</Text>
         <Box textAlign="center" marginLeft="50px">
           <Lottie
             loop
@@ -35,6 +56,25 @@ export default function Login() {
             play
             style={{ width: 400, height: 400 }}
           />
+        </Box>
+        <Text marginTop="-70px" fontWeight="bold" fontSize='sm'>Live stats (no)</Text>
+        <Box
+          position="relative"
+          display="flex"
+          width="300px"
+          alignSelf="center"
+          marginTop="15px"
+          // boxShadow="sm"
+          borderRadius="15px"
+          backgroundColor="white"
+          padding="10px"
+        >
+          <Stats marginLeft="10px" marginRight="15px" width="50%" label="Market trades" value="98735323">
+            <RepeatIcon />
+          </Stats>
+          <Stats paddingLeft="20px" borderLeft="1px solid #efefef" width="50%" label="Sales" value="2393832">
+            <PlusSquareIcon />
+          </Stats>
         </Box>
       </Box>
       <Box
@@ -44,7 +84,7 @@ export default function Login() {
         alignSelf="center"
       >
         <div className={styles.container} alignSelf="stretch">
-         {/* wrong place for this, no  */}
+          {/* wrong place for this, no  */}
           <Head>
             <title>Mato SDK</title>
             <meta name="description" content="Mato SDK dashboard" />
