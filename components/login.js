@@ -2,7 +2,7 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Box, Flex, Spinner, Text, Tooltip } from '@chakra-ui/react'
+import { Box, Flex, Link, Spinner, Text, Tooltip } from '@chakra-ui/react'
 import React from "react";
 import Lottie from 'react-lottie-player'
 import animation from "../public/animation.json"
@@ -76,6 +76,18 @@ export default function Login() {
             <PlusSquareIcon />
           </Stats>
         </Box>
+        <Box
+          alignSelf="flex-end"
+          marginBottom="20px"
+          marginTop="auto"
+          padding="0"
+          color="rgb(118 118 118)"
+          fontSize="xs"
+          paddingX="20px"
+          >
+          By pressing connect button you're agreeing with <Link href="#terms">Terms and conditions</Link>.
+          Services provided on "AS IS" basis. All source code available on <Link>github</Link>. 2022. All rights reserved
+        </Box>
       </Box>
       <Box
         display={"flex"}
@@ -83,7 +95,7 @@ export default function Login() {
         width={rightWitdth}
         alignSelf="center"
       >
-        <div className={styles.container} alignSelf="stretch">
+        <div className={styles.container}>
           {/* wrong place for this, no  */}
           <Head>
             <title>Mato SDK</title>
