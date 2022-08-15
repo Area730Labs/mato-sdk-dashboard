@@ -30,9 +30,13 @@ function Stats(props) {
 export default function Login() {
 
   const { connecting, publicKey } = useWallet();
-  const {authorizeState} = useAppContext();
+  const {authorizeState,projects} = useAppContext();
 
-  const msg = publicKey ? 'Sign a message in wallet to authorize' : 'Connecting wallet...';
+  let msg = publicKey ? 'Sign a message in wallet to authorize' : 'Connecting wallet...';
+
+  if (AuthorizeState.noproject) {
+    msg = 'Confirm project creation to continue';
+  } 
 
   let inProgress = authorizeState != AuthorizeState.rejected && (connecting || publicKey);
 
@@ -108,7 +112,7 @@ export default function Login() {
             {inProgress && (
               <>
                 <Spinner size='lg' color='green.400' />
-                <p className='pt-2'>{msg}</p>
+                <Text paddingTop="4">{msg}</Text>
               </>
             )}
 

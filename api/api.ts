@@ -19,6 +19,11 @@ export interface SdkItem {
     inactive: boolean
 }
 
+export interface SdkProject {
+    authority: string,
+    address: string,
+}
+
 class Api {
 
     private project_key: PublicKey;
@@ -37,18 +42,32 @@ class Api {
         return result.items;
     }
 
-    async wallet_projects(host:string, sig): Promise<any[]> {
+    async wallet_projects(host: string, sig): Promise<SdkProject[]> {
 
         let old_host = this.host;
         this.host = host;
 
-        let result = await this.sendRequest("get", `projects?args=`+JSON.stringify(sig));
+        let result = await this.sendRequest("get", `projects?args=` + JSON.stringify(sig));
 
         this.host = old_host;
 
         return result.items;
     }
 
+
+    async has_projects(host: string, signer: PublicKey): Promise<boolean> {
+        let old_host = this.host;
+        this.host = host;
+
+        try {
+            let result = await this.sendRequest("get", `has_projects/${signer.toString()}`);
+            this.host = old_host;
+            
+            return result.ok;
+        } catch (e) {
+            return false;
+        }
+    }
 
     private async sendRequest(rm: Method, method: string, args?: any): Promise<any> {
 

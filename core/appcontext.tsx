@@ -10,14 +10,17 @@ import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes/index";
 import { v4 as uuidv4 } from 'uuid';
 import { useWallet } from '@solana/wallet-adapter-react';
 import Api from "../api/api";
+import { SdkProject } from "../api/api";
+import ChainSdk from "../chain/sdk";
 
 export type TransactionType = "system" | "platform" | "other"
-export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
+export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[], label: string): Promise<web3.TransactionSignature> }
 
 export enum AuthorizeState {
     initial,
     authorizing,
     rejected,
+    noproject,
     authorized
 }
 
@@ -25,6 +28,7 @@ export interface AppContextType {
 
     authorizeState: AuthorizeState,
     authorized: boolean | null
+
     // solana 
     solanaConnection: SolanaRpc
     setSolanaNode: any
@@ -38,6 +42,9 @@ export interface AppContextType {
     // lang: Lang,
     // setLang: { (value: Lang) }
     connection: web3.Connection
+
+    // app 
+    projects: SdkProject[],
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -63,6 +70,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const [authorized, setAuthorized] = useState<boolean>(false);
 
     const [authorizeState, setAuthorizedState] = useState<AuthorizeState>(AuthorizeState.initial);
+    const [projects, setProjects] = useState<SdkProject[]>([]);
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, {
@@ -79,33 +87,51 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
             setWallet(wallet.adapter);
 
-            const timestamp = Math.floor(new Date().getTime()/1000);
+            const timestamp = Math.floor(new Date().getTime() / 1000);
 
             let guid = uuidv4();
-            let bytes = new TextEncoder().encode('authorize request; ' + guid+"; "+timestamp);
+            let bytes = new TextEncoder().encode('authorize request; ' + guid + "; " + timestamp);
 
-            signMessage(bytes).then((signed) => {
+            let host = 'http://localhost:8051/';
 
-                let sig = bs58.encode(signed);
+            let walletProjects = new Api(web3.SystemProgram.programId)
+                .has_projects(host, wallet.adapter.publicKey).then((has_projects) => {
+                    if (has_projects) {
+                        signMessage(bytes).then((signed) => {
 
-                let request = {
-                    guid,
-                    signature: sig,
-                    wallet: publicKey.toString(),
-                    timestamp
-                }
+                            let sig = bs58.encode(signed);
 
-                setAuthorized(true);
+                            let request = {
+                                guid,
+                                signature: sig,
+                                wallet: publicKey.toString(),
+                                timestamp
+                            }
 
-                let walletProjects = new Api(web3.SystemProgram.programId)
-                    .wallet_projects("http://localhost:8051/",request);
+                            setAuthorized(true);
 
-                console.warn('signed a message', request)
-                setAuthorizedState(AuthorizeState.authorized);
+                            let walletProjects = new Api(web3.SystemProgram.programId)
+                                .wallet_projects(host, request).then((api_projects) => {
+                                    setProjects(api_projects);
+                                });
 
-            }).catch((e) => {
-                setAuthorizedState(AuthorizeState.rejected);
-            });
+                            console.warn('signed a message', request)
+                            setAuthorizedState(AuthorizeState.authorized);
+
+                        }).catch((e) => {
+                            setAuthorizedState(AuthorizeState.rejected);
+                        });
+                    } else {
+                        setAuthorizedState(AuthorizeState.noproject);
+                        const ix = new ChainSdk(wallet.adapter).createProject();
+
+                        sendTx([ix], "system").catch((e) => {
+                            toast.error('Unable to create project: ' + e.message)
+                            setAuthorizedState(AuthorizeState.rejected);
+                        });
+                    }
+                });
+
         } else {
             setWallet(null);
         }
@@ -266,7 +292,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             });
 
             toast.promise(sigConfirmPromise, {
-                pending: 'Waiting ' + curtx.Type + ' operation',
+                pending: curtx.label != "" ? curtx.label : ('Waiting ' + curtx.Type + ' operation'),
                 success: {
                     icon: Icons.success,
                     render() {
@@ -297,7 +323,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }
     }, [connectedWallet, userUpdatesCounter]);
 
-    function sendTx(ixs: web3.TransactionInstruction[], typ: TransactionType = 'other', signers?: []): Promise<web3.TransactionSignature> {
+    function sendTx(ixs: web3.TransactionInstruction[], typ: TransactionType = 'other', signers?: [], label : string = "" ): Promise<web3.TransactionSignature> {
 
         if (curtx != null) {
             return Promise.reject(new Error("wait till current transaction is confirmed"));
@@ -318,6 +344,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
                         Signature: signature,
                         CreatedAt: new Date().getTime(),
                         Type: typ,
+                        label: label
                     });
                 }
 
@@ -344,7 +371,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
             // // lang 
             // lang,
             // setLang,
-            connection: web3Handler
+            connection: web3Handler,
+
+            projects
         };
 
         return curCtx
@@ -353,6 +382,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         authorized, authorizeState,
         rpc_wrapper, connectedWallet,
         curtx, userUpdatesCounter,
+        projects
         // lang, 
     ]);
 

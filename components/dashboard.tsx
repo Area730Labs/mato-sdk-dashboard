@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import { useWallet } from '@solana/wallet-adapter-react';
 import Charts from './charts';
 import LimitedItems from './limitedItems';
 import { Badge, Box, Flex, List, ListItem, StyleProps, Text } from "@chakra-ui/react";
 import { LockIcon } from "@chakra-ui/icons";
 import Address from "./core/Address";
+import { useAppContext } from "../core/appcontext";
+import SetupWizard from "./setupWizard";
 
 function EmptyPage() {
     return <></>
@@ -48,21 +50,37 @@ function CompiledMenuItem(props: CompiledMenuItemProps) {
     </ListItem>
 }
 
+interface MenuItem {
+    title: string,
+    loc: string,
+    btnAction(),
+    component: FC,
+    skip_main?: boolean,
+    badge?: JSX.Element
+}
+
 export default function Dashboard(props) {
     const { disconnect, publicKey, wallet } = useWallet();
-
     let [tab, setTab] = useState('limited-items');
+    const {projects} = useAppContext();
 
-    const settingButton = {
+    const settingButton: MenuItem = {
         title: 'Settings',
         loc: 'settings',
         btnAction: () => setTab('settings'),
         component: EmptyPage,
         skip_main: true
     };
-    
 
-    const menuItems = [
+    const setupWizard: MenuItem = {
+        title: 'Setup wizard',
+        loc: 'setup-wizard',
+        btnAction: () => setTab('setup-wizard'),
+        component: SetupWizard,
+        skip_main: true
+    };
+
+    const menuItems: MenuItem[] = [
         {
             title: 'Dashboard',
             loc: 'charts',
@@ -91,7 +109,8 @@ export default function Dashboard(props) {
             btnAction: () => setTab('earnings'),
             component: EmptyPage,
         },
-        settingButton
+        settingButton,
+        setupWizard
     ];
 
 
@@ -104,6 +123,10 @@ export default function Dashboard(props) {
         },
         component: EmptyPage,
     };
+
+    if (projects.length == 0) {
+        tab = "setup-wizard";
+    }
 
     const paddingLeft = 6;
     const outerPadding = 4;
@@ -121,7 +144,7 @@ export default function Dashboard(props) {
                 <List padding={outerPadding} >
                     {menuItems.map(item =>
                         item.skip_main ? null :
-                        <CompiledMenuItem key={item.loc} item={item} tab={tab} />
+                            <CompiledMenuItem key={item.loc} item={item} tab={tab} />
                     )}
                 </List>
                 <List padding={outerPadding} justifySelf="stretch" marginBottom="10px" marginTop="auto" >
@@ -144,7 +167,10 @@ export default function Dashboard(props) {
             </Box>
         </Flex>
         <Box padding={outerPadding}>
-            <Content />
+            {/* display="flex" 
+             justifyContent="center" 
+                    alignItems="center"> */}
+            <Content /> 
         </Box>
     </Box>
     );

@@ -11,6 +11,7 @@ interface CurrentTx {
     CreatedAt: number
     Signature: string
     Type: TransactionType
+    label: string
 }
 
 function storeCurrentTx(item: CurrentTx, wallet: WalletAdapter) {
