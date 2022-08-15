@@ -116,8 +116,6 @@ export default function Dashboard(props) {
     const paddingLeft = 6;
     const outerPadding = 4;
 
-    console.warn('tab choosen: ',tab);
-
     const currentContent = menuItems.find(x => x.loc == tab);
     const Content = currentContent.component;
 

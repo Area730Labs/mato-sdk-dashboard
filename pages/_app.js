@@ -32,6 +32,7 @@ function App({ Component, pageProps }) {
       alignItems="center"
       position="relative"
       height="100vh"
+      marginY={"32px"}
     >
       <ChakraProvider>
         <ConnectionProvider endpoint={endpoint}>
@@ -48,9 +49,7 @@ function App({ Component, pageProps }) {
                   boxShadow="xl"
                   minH={"660px"}
                   alignContent="stretch"
-                  marginTop={"16px"}
-                  marginBottom={"16px"}
-                  style={{transition:"all .2 ease"}}
+                  style={{transition:"all 0.2 ease"}}
                 >
                   <Component {...pageProps} />
                 </Container>

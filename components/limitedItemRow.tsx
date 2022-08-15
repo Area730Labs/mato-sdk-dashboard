@@ -39,7 +39,7 @@ export default function LimitedRowItem(props: LimitedRowItemProps) {
     const fontWeight = mintHover ? "bold" : "normal"; 
 
     return (
-        <Tr {...restprops} style={{ transition: "all .2 ease" }}>
+        <Tr {...restprops}>
             <Td textAlign='center'>
                 <Switch colorScheme='green' isChecked={enabled} onChange={toggleActive} />
             </Td>
@@ -71,7 +71,7 @@ export default function LimitedRowItem(props: LimitedRowItemProps) {
                     navigator.clipboard.writeText(item.mint);
                     toast.info('mint address copied');
                 }}
-                
+
                 >
 
                 {item.mint.substring(0, 8)}... <CopyIcon style={{ opacity: mintHover ? 1 : 0 }} />
