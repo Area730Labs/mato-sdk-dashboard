@@ -50,6 +50,7 @@ function App({ Component, pageProps }) {
                   alignContent="stretch"
                   marginTop={"16px"}
                   marginBottom={"16px"}
+                  style={{transition:"all .2 ease"}}
                 >
                   <Component {...pageProps} />
                 </Container>

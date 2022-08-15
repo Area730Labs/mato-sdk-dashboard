@@ -75,24 +75,16 @@ export default function CreateLimitedItemForm(props) {
     }
 
     return (
-        <Modal onClose={onClose} isOpen={props.isOpen} isCentered>
+        <Modal onClose={onClose} isOpen={props.isOpen} isCentered >
             <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>
+            <ModalContent borderRadius="24px" padding="4">
+                <ModalHeader position="relative">
                     <Label>Create new limited item</Label>
+                    <ModalCloseButton marginTop="2"/>
                 </ModalHeader>
-                <ModalCloseButton />
+              
                 <ModalBody>
                     <FormControl>
-                        {/* <FormLabel>
-                            <Label>Name (dashboard only)</Label>
-                        </FormLabel>
-                        <Input
-                            value={formValues.itemName}
-                            onChange={changeHandler}
-                            name='itemName'
-                            autoComplete="off"
-                        /> */}
 
                         <FormLabel mt='0.5rem'>
                             <Label>Game uid</Label>
@@ -117,10 +109,6 @@ export default function CreateLimitedItemForm(props) {
                                     placeholder='10000'
                                 />
                         </NumberInput>
-
-                        {/* <SupplySlider value={supply} changeHandler={(newSupply) => {
-                            setSupply(newSupply);
-                        }} /> */}
 
                         <FormLabel mt='0.5rem'>
                             <Label>Price per item</Label>

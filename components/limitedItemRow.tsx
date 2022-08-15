@@ -26,32 +26,55 @@ export default function LimitedRowItem(props: LimitedRowItemProps) {
 
 
     let { item, ...restprops } = props;
-    let [enabled,setEnabled] = useState(!item.inactive);
-
-    const showCopyOkToast = () => {
-        toast.info('copied to clipboard');
-    }
+    let [enabled, setEnabled] = useState(!item.inactive);
 
     const soldPercent = Math.round((item.sold / item.supply) * 100);
     const toggleActive = () => {
         setEnabled(!enabled);
     }
 
+    const [mintHover, setHoverMint] = useState(false);
+    const [gameuidHover, setHoverGameuid] = useState(false);
+
+    const fontWeight = mintHover ? "bold" : "normal"; 
+
     return (
-        <Tr {...restprops}>
+        <Tr {...restprops} style={{ transition: "all .2 ease" }}>
             <Td textAlign='center'>
                 <Switch colorScheme='green' isChecked={enabled} onChange={toggleActive} />
             </Td>
-            <Td>{item.uid}</Td>
-            <Td>
-                {item.mint.substring(0, 8)}...
-                <a href="#" onClick={(e) => {
+            <Td
+                onMouseEnter={() => {
+                    setHoverGameuid(true);
+                }}
+                onMouseLeave={() => {
+                    setHoverGameuid(false);
+                }}
+
+                onClick={(e) => {
+                    e.stopPropagation()
+                    navigator.clipboard.writeText(item.uid);
+                    toast.info('uid copied');
+                }}
+
+            >{item.uid} <CopyIcon style={{ opacity: gameuidHover ? 1 : 0 }} /></Td>
+            <Td
+                onMouseEnter={() => {
+                    setHoverMint(true);
+                }}
+                onMouseLeave={() => {
+                    setHoverMint(false);
+                }}
+
+                onClick={(e) => {
                     e.stopPropagation()
                     navigator.clipboard.writeText(item.mint);
-                    showCopyOkToast();
-                }}>
-                    <CopyIcon />
-                </a>
+                    toast.info('mint address copied');
+                }}
+                
+                >
+
+                {item.mint.substring(0, 8)}... <CopyIcon style={{ opacity: mintHover ? 1 : 0 }} />
             </Td>
             <Td isNumeric>{item.supply.toString().toLocaleString()}</Td>
             <Td isNumeric>{item.price.toString().toLocaleString()}</Td>
