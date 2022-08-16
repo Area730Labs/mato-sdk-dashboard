@@ -22,6 +22,7 @@ import React, { useState } from "react";
 import Label from "./core/label";
 import { InfoIcon, WarningIcon } from '@chakra-ui/icons'
 import { PublicKey } from '@solana/web3.js';
+import global_config from '../core/config';
 
 export interface CreateItemForm {
     price: number,
@@ -30,16 +31,12 @@ export interface CreateItemForm {
     game_uid: string,
 };
 
-export const USDC_TOKEN = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
-export const SOL_TOKEN = new PublicKey("So11111111111111111111111111111111111111112");
-
 export default function CreateLimitedItemForm(props) {
 
     const [formValues, setFormValues] = useState<CreateItemForm>({
-        // itemName: '',
         game_uid: '',
         price: 0,
-        payment_mint: USDC_TOKEN,
+        payment_mint: global_config.default_payment_mint,
         supply: 0,
     });
 
@@ -48,6 +45,20 @@ export default function CreateLimitedItemForm(props) {
     }
 
     const saveHandler = e => {
+
+
+        let payment_token_info = global_config.payment_tokens.find(x => {
+            const result = x.mint.toString() == formValues.payment_mint.toString();
+            return result;
+        })
+
+
+        console.log('found',payment_token_info)
+
+        let token_one = Math.pow(10,payment_token_info.decimals);
+
+        formValues.price = token_one * formValues.price; 
+
         props.onSave(formValues)
     }
 
@@ -58,13 +69,12 @@ export default function CreateLimitedItemForm(props) {
     const onClose = () => {
         props.onClose();
 
-        // setFormValues({
-        //     // itemName: '',
-        //     gameUid: '',
-        //     price: 0,
-        //     supply: 0,
-        //     tokenSymbol: ''
-        // });
+        setFormValues({
+            game_uid: '',
+            price: 0,
+            supply: 0,
+            payment_mint: global_config.default_payment_mint
+        });
     };
 
     const changePaymentToken = (e) => {
@@ -125,8 +135,9 @@ export default function CreateLimitedItemForm(props) {
                                 </GridItem>
                                 <GridItem colSpan={3}>
                                     <Select placeholder={<Label>Payment token</Label>} value={formValues.payment_mint.toString()} onChange={changePaymentToken}>
-                                        <option value={USDC_TOKEN.toString()}><Label>USDC</Label></option>
-                                        <option value={SOL_TOKEN.toString()}><Label>SOL</Label></option>
+                                        {global_config.payment_tokens.map(item =>
+                                            <option value={item.mint.toString()}><Label>{item.name}</Label></option>
+                                        )}
                                     </Select>
                                 </GridItem>
                             </Grid>

@@ -32,7 +32,7 @@ function App({ Component, pageProps }) {
       alignItems="center"
       position="relative"
       height="100vh"
-      marginY={"32px"}
+      marginY={"16px"}
     >
       <ChakraProvider>
         <ConnectionProvider endpoint={endpoint}>

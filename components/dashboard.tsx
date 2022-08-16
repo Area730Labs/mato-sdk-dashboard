@@ -2,7 +2,7 @@ import React, { FC, useState } from "react";
 import { useWallet } from '@solana/wallet-adapter-react';
 import Charts from './charts';
 import LimitedItems from './limitedItems';
-import { Badge, Box, Flex, List, ListItem, Spinner, StyleProps, Text } from "@chakra-ui/react";
+import { Button, Badge, Box, Flex, List, ListItem, Spinner, StyleProps, Text } from "@chakra-ui/react";
 import { LockIcon } from "@chakra-ui/icons";
 import Address from "./core/Address";
 import { useAppContext } from "../core/appcontext";
@@ -61,7 +61,7 @@ interface MenuItem {
 export default function Dashboard(props) {
     const { disconnect, publicKey, wallet } = useWallet();
     let [tab, setTab] = useState('limited-items');
-    const { projects,logout } = useAppContext();
+    const { projects, logout } = useAppContext();
 
 
     // useEffect(() => {
@@ -169,9 +169,6 @@ export default function Dashboard(props) {
             </Box>
         </Flex>
         <Box padding={outerPadding}>
-            {/* display="flex" 
-             justifyContent="center" 
-                    alignItems="center"> */}
             <Content />
         </Box>
     </Box>

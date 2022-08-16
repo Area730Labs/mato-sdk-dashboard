@@ -7,10 +7,13 @@ import {
     CircularProgressLabel,
     SystemProps,
 } from '@chakra-ui/react'
+import { withTheme } from '@emotion/react';
 import Image from 'next/image'
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { SdkItem } from '../api/api';
+import global_config from '../core/config';
+import Address from './core/Address';
 
 
 export interface LimitedRowItemProps extends SystemProps {
@@ -36,11 +39,33 @@ export default function LimitedRowItem(props: LimitedRowItemProps) {
     const [mintHover, setHoverMint] = useState(false);
     const [gameuidHover, setHoverGameuid] = useState(false);
 
-    const fontWeight = mintHover ? "bold" : "normal"; 
+    const fontWeight = mintHover ? "bold" : "normal";
+
+    const evenStyle = {
+        backgroundColor: "rgb(243 244 246)",
+    }
+
+    const bRadius = "10px";
+
+    const payment_info = useMemo(() => {
+        
+        const info =  global_config.payment_tokens.find(x => x.mint.toString() == item.price_mint);
+        const one = Math.pow(10,info.decimals);
+
+        return {
+            one,
+            info,
+        }
+
+    },[item])
+
+    const price_value = item.price/payment_info.one;
 
     return (
-        <Tr {...restprops}>
-            <Td textAlign='center'>
+        <Tr {...restprops}
+            _even={evenStyle}
+        >
+            <Td textAlign='center' _first={{ borderLeftRadius: bRadius }}>
                 <Switch colorScheme='green' isChecked={enabled} onChange={toggleActive} />
             </Td>
             <Td
@@ -72,14 +97,13 @@ export default function LimitedRowItem(props: LimitedRowItemProps) {
                     toast.info('mint address copied');
                 }}
 
-                >
-
-                {item.mint.substring(0, 8)}... <CopyIcon style={{ opacity: mintHover ? 1 : 0 }} />
+            >
+                <Address addr={item.mint}/> <CopyIcon style={{ opacity: mintHover ? 1 : 0 }} />
             </Td>
             <Td isNumeric>{item.supply.toString().toLocaleString()}</Td>
-            <Td isNumeric>{item.price.toString().toLocaleString()}</Td>
+            <Td isNumeric>{price_value} {payment_info.info.name}</Td>
             <Td isNumeric>{item.sold.toString().toLocaleString()}</Td>
-            <Td textAlign='end'>
+            <Td textAlign='end' _last={{ borderRightRadius: bRadius }}>
                 <CircularProgress value={soldPercent} color='green.400'>
                     <CircularProgressLabel>{soldPercent}%</CircularProgressLabel>
                 </CircularProgress>

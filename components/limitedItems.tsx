@@ -11,7 +11,7 @@ import {
     TableContainer,
 } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/react'
-import CreateLimitedItemForm, { CreateItemForm, USDC_TOKEN } from './createLimitedItemForm';
+import CreateLimitedItemForm, { CreateItemForm } from './createLimitedItemForm';
 import LimitedRowItem from './limitedItemRow'
 import ChainSdk from '../chain/sdk';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -21,6 +21,7 @@ import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes';
 import { useProjectContext } from './projectContext';
 import { toast } from 'react-toastify';
 import { Listing } from '../chain/generated/accounts/Listing';
+import global_config from '../core/config';
 
 export default function LimitedItems() {
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -83,7 +84,7 @@ export default function LimitedItems() {
 
         const ix = new ChainSdk(wallet.adapter).createEscrowTokenAccount(
             project_id,
-            USDC_TOKEN,
+            global_config.default_payment_mint,
         );
 
         sendTx([ix], "system").catch((e) => {
@@ -193,6 +194,7 @@ export default function LimitedItems() {
             <Button colorScheme='teal' size='sm' onClick={testTx}>
                 test buy tx
             </Button>
+
             <Button onClick={create_project}>
                 +project
             </Button>
