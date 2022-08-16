@@ -30,13 +30,13 @@ function Stats(props) {
 export default function Login() {
 
   const { connecting, publicKey } = useWallet();
-  const {authorizeState,projects} = useAppContext();
+  const { authorizeState, projects } = useAppContext();
 
   let msg = publicKey ? 'Sign a message in wallet to authorize' : 'Connecting wallet...';
 
   if (authorizeState == AuthorizeState.noproject) {
     msg = 'Confirm project creation to continue';
-  } 
+  }
 
   let inProgress = authorizeState != AuthorizeState.rejected && (connecting || publicKey);
 
@@ -89,7 +89,7 @@ export default function Login() {
           color="rgb(118 118 118)"
           fontSize="xs"
           paddingX="20px"
-          >
+        >
           By pressing connect button you're agreeing with <Link href="#terms">Terms and conditions</Link>.
           Services provided on "AS IS" basis. All source code available on <Link>github</Link>. 2022. All rights reserved
         </Box>
@@ -108,6 +108,11 @@ export default function Login() {
             <link rel="icon" href="/favicon.ico" />
           </Head>
 
+          <Box backgroundColor="orange" padding="15px" borderRadius="10px">
+            <Text fontSize="xl" color="white">
+              This is a preview devnet version for <Link href="https://solana.com/summercamp">Solana Summer Camp</Link>
+            </Text>
+          </Box>
           <Box className={styles.main}>
             {inProgress && (
               <>

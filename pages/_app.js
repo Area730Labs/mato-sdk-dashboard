@@ -4,7 +4,7 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
 import { useMemo } from 'react'
-import { Box, ChakraProvider, Container } from '@chakra-ui/react'
+import { Box, ChakraProvider, Container, Link, Text } from '@chakra-ui/react'
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 import '../styles/globals.css'
@@ -49,7 +49,7 @@ function App({ Component, pageProps }) {
                   boxShadow="xl"
                   minH={"660px"}
                   alignContent="stretch"
-                  style={{transition:"all 0.2 ease"}}
+                  style={{ transition: "all 0.2 ease" }}
                 >
                   <Component {...pageProps} />
                 </Container>

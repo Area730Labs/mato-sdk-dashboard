@@ -80,7 +80,8 @@ export default function Dashboard(props) {
         loc: 'settings',
         btnAction: () => setTab('settings'),
         component: EmptyPage,
-        skip_main: true
+        skip_main: true,
+        badge: <Badge variant='outline' >Soon</Badge>
     };
 
     const menuItems: MenuItem[] = [
@@ -111,6 +112,7 @@ export default function Dashboard(props) {
             loc: 'earnings',
             btnAction: () => setTab('earnings'),
             component: EmptyPage,
+            badge: <Badge variant='outline' >Soon</Badge>
         },
         settingButton,
     ];
