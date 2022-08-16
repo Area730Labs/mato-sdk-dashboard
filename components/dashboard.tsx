@@ -2,11 +2,10 @@ import React, { FC, useState } from "react";
 import { useWallet } from '@solana/wallet-adapter-react';
 import Charts from './charts';
 import LimitedItems from './limitedItems';
-import { Badge, Box, Flex, List, ListItem, StyleProps, Text } from "@chakra-ui/react";
+import { Badge, Box, Flex, List, ListItem, Spinner, StyleProps, Text } from "@chakra-ui/react";
 import { LockIcon } from "@chakra-ui/icons";
 import Address from "./core/Address";
 import { useAppContext } from "../core/appcontext";
-import SetupWizard from "./setupWizard";
 
 function EmptyPage() {
     return <></>
@@ -62,21 +61,25 @@ interface MenuItem {
 export default function Dashboard(props) {
     const { disconnect, publicKey, wallet } = useWallet();
     let [tab, setTab] = useState('limited-items');
-    const {projects} = useAppContext();
+    const { projects,logout } = useAppContext();
+
+
+    // useEffect(() => {
+    //     if (authorizeState == AuthorizeState.signuptxwait) {
+
+    //         setInterval(() => {
+    //             new Api(web3.SystemProgram.programId).has_projects
+    //         },1000);
+
+    //     }
+    // },[authorizeState]);
+
 
     const settingButton: MenuItem = {
         title: 'Settings',
         loc: 'settings',
         btnAction: () => setTab('settings'),
         component: EmptyPage,
-        skip_main: true
-    };
-
-    const setupWizard: MenuItem = {
-        title: 'Setup wizard',
-        loc: 'setup-wizard',
-        btnAction: () => setTab('setup-wizard'),
-        component: SetupWizard,
         skip_main: true
     };
 
@@ -110,29 +113,28 @@ export default function Dashboard(props) {
             component: EmptyPage,
         },
         settingButton,
-        setupWizard
     ];
 
 
     const signOutButton = {
-        title: 'Sign Out',
+        title: 'Sign out',
         loc: 'sign-out',
         btnAction: () => {
+            logout();
             disconnect().catch(() => { });
+
             console.log('log out');
         },
         component: EmptyPage,
     };
 
-    if (projects.length == 0) {
-        tab = "setup-wizard";
-    }
+    let loading = projects.length == 0;
 
     const paddingLeft = 6;
     const outerPadding = 4;
 
     const currentContent = menuItems.find(x => x.loc == tab);
-    const Content = currentContent.component;
+    let Content = loading ? LoadingContent : currentContent.component;
 
     return (<Box display="flex" overflow="hidden">
         <Flex flexDir="column" width="220px">
@@ -170,8 +172,18 @@ export default function Dashboard(props) {
             {/* display="flex" 
              justifyContent="center" 
                     alignItems="center"> */}
-            <Content /> 
+            <Content />
         </Box>
     </Box>
     );
+}
+
+function LoadingContent() {
+
+    const msg = "loading";
+
+    return <>
+        <Spinner size='lg' color='green.400' />
+        <Text paddingTop="4">{msg}</Text>
+    </>
 }

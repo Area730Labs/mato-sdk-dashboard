@@ -12,6 +12,8 @@ export interface SdkProjectFields {
   bump: number
   escrowBump: number
   marketEscrowBump: number
+  secondarySellsTaxPercentBasisPoints: number
+  subscriptionLevel: number
 }
 
 export interface SdkProjectJSON {
@@ -22,6 +24,8 @@ export interface SdkProjectJSON {
   bump: number
   escrowBump: number
   marketEscrowBump: number
+  secondarySellsTaxPercentBasisPoints: number
+  subscriptionLevel: number
 }
 
 export class SdkProject {
@@ -32,6 +36,8 @@ export class SdkProject {
   readonly bump: number
   readonly escrowBump: number
   readonly marketEscrowBump: number
+  readonly secondarySellsTaxPercentBasisPoints: number
+  readonly subscriptionLevel: number
 
   static readonly discriminator = Buffer.from([
     27, 88, 211, 108, 68, 30, 244, 70,
@@ -45,6 +51,8 @@ export class SdkProject {
     borsh.u8("bump"),
     borsh.u8("escrowBump"),
     borsh.u8("marketEscrowBump"),
+    borsh.u16("secondarySellsTaxPercentBasisPoints"),
+    borsh.u8("subscriptionLevel"),
   ])
 
   constructor(fields: SdkProjectFields) {
@@ -55,6 +63,9 @@ export class SdkProject {
     this.bump = fields.bump
     this.escrowBump = fields.escrowBump
     this.marketEscrowBump = fields.marketEscrowBump
+    this.secondarySellsTaxPercentBasisPoints =
+      fields.secondarySellsTaxPercentBasisPoints
+    this.subscriptionLevel = fields.subscriptionLevel
   }
 
   static async fetch(
@@ -106,6 +117,9 @@ export class SdkProject {
       bump: dec.bump,
       escrowBump: dec.escrowBump,
       marketEscrowBump: dec.marketEscrowBump,
+      secondarySellsTaxPercentBasisPoints:
+        dec.secondarySellsTaxPercentBasisPoints,
+      subscriptionLevel: dec.subscriptionLevel,
     })
   }
 
@@ -118,6 +132,9 @@ export class SdkProject {
       bump: this.bump,
       escrowBump: this.escrowBump,
       marketEscrowBump: this.marketEscrowBump,
+      secondarySellsTaxPercentBasisPoints:
+        this.secondarySellsTaxPercentBasisPoints,
+      subscriptionLevel: this.subscriptionLevel,
     }
   }
 
@@ -130,6 +147,9 @@ export class SdkProject {
       bump: obj.bump,
       escrowBump: obj.escrowBump,
       marketEscrowBump: obj.marketEscrowBump,
+      secondarySellsTaxPercentBasisPoints:
+        obj.secondarySellsTaxPercentBasisPoints,
+      subscriptionLevel: obj.subscriptionLevel,
     })
   }
 }

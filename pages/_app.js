@@ -27,7 +27,7 @@ function App({ Component, pageProps }) {
   return (
     <Box
       display="flex"
-      width="100%"
+      // width="100%"
       minHeight="100%"
       alignItems="center"
       position="relative"

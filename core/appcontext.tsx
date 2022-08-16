@@ -12,22 +12,26 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import Api from "../api/api";
 import { SdkProject } from "../api/api";
 import ChainSdk from "../chain/sdk";
+import { getActiveProject, setActiveProject } from "../components/projectContext";
+import { getActiveWallet } from "./auth";
 
-export type TransactionType = "system" | "platform" | "other"
-export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[], label: string): Promise<web3.TransactionSignature> }
+export type TransactionType = "system" | "signup" | "platform" | "other"
+export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[], label?: string): Promise<web3.TransactionSignature> }
 
 export enum AuthorizeState {
     initial,
     authorizing,
     rejected,
     noproject,
-    authorized
+    authorized,
+    signuptxwait
 }
 
 export interface AppContextType {
 
     authorizeState: AuthorizeState,
     authorized: boolean | null
+    logout(),
 
     // solana 
     solanaConnection: SolanaRpc
@@ -67,10 +71,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const [queueProcessorStarted, setStarted] = useState(false);
 
     const { publicKey, signMessage, connected, wallet } = useWallet();
-    const [authorized, setAuthorized] = useState<boolean>(false);
+    const [authorized, setAuthorized] = useState<boolean>(false);//getActiveWallet() != null);
 
     const [authorizeState, setAuthorizedState] = useState<AuthorizeState>(AuthorizeState.initial);
     const [projects, setProjects] = useState<SdkProject[]>([]);
+
+    const logout = () => {
+        setAuthorized(false);
+        setAuthorizedState(AuthorizeState.initial);
+    };
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, {
@@ -82,21 +91,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         if (connected) {
+            setWallet(wallet.adapter);
+        }
+    }, [connected]);
+
+    useEffect(() => {
+
+        if (connectedWallet != null) {
 
             setAuthorizedState(AuthorizeState.authorizing);
-
-            setWallet(wallet.adapter);
 
             const timestamp = Math.floor(new Date().getTime() / 1000);
 
             let guid = uuidv4();
             let bytes = new TextEncoder().encode('authorize request; ' + guid + "; " + timestamp);
 
-            let host = 'http://localhost:8051/';
-
             let walletProjects = new Api(web3.SystemProgram.programId)
-                .has_projects(host, wallet.adapter.publicKey).then((has_projects) => {
+                .has_projects(connectedWallet.publicKey).then((has_projects) => {
                     if (has_projects) {
+
                         signMessage(bytes).then((signed) => {
 
                             let sig = bs58.encode(signed);
@@ -110,32 +123,47 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
                             setAuthorized(true);
 
-                            let walletProjects = new Api(web3.SystemProgram.programId)
-                                .wallet_projects(host, request).then((api_projects) => {
+                            new Api()
+                                .wallet_projects(request).then((api_projects) => {
                                     setProjects(api_projects);
+                                    
+                                    let curProject = getActiveProject(connectedWallet.publicKey);
+                                    if (curProject == null) {
+                                        const first_project = api_projects[0].address;
+                                        setActiveProject(first_project,connectedWallet.publicKey);
+                                        toast.info(`set current project to ${first_project}`)
+                                    }
                                 });
 
-                            console.warn('signed a message', request)
                             setAuthorizedState(AuthorizeState.authorized);
 
                         }).catch((e) => {
                             setAuthorizedState(AuthorizeState.rejected);
                         });
                     } else {
-                        setAuthorizedState(AuthorizeState.noproject);
-                        const ix = new ChainSdk(wallet.adapter).createProject();
 
-                        sendTx([ix], "system").catch((e) => {
-                            toast.error('Unable to create project: ' + e.message)
-                            setAuthorizedState(AuthorizeState.rejected);
-                        });
+                        console.log('wallet has no projects');
+                        setAuthorizedState(AuthorizeState.noproject);
+
+                        try {
+                            const [addr, ix] = new ChainSdk(wallet.adapter).createProject();
+
+                            sendTx([ix], 'signup').then(() => {
+                                setActiveProject(addr, wallet.adapter.publicKey);
+                            }).catch((e) => {
+                                toast.error('Unable to create project: ' + e.message)
+                                setAuthorizedState(AuthorizeState.rejected);
+                            });
+                        } catch (e) {
+                            console.error('unable to create signup transaction', e)
+                        }
                     }
                 });
 
         } else {
             setWallet(null);
         }
-    }, [connected]);
+    }, [connectedWallet]);
 
     // useEffect(() => {
 
@@ -283,6 +311,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
                     case 'system': {
                         break;
                     }
+                    case 'signup': {
+                        setAuthorized(true);
+                        setAuthorizedState(AuthorizeState.authorized);
+                        break;
+                    }
                     default: {
                         toast.warn('unknown tx type got: ' + tx_type)
                     }
@@ -323,7 +356,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }
     }, [connectedWallet, userUpdatesCounter]);
 
-    function sendTx(ixs: web3.TransactionInstruction[], typ: TransactionType = 'other', signers?: [], label : string = "" ): Promise<web3.TransactionSignature> {
+    function sendTx(ixs: web3.TransactionInstruction[], typ: TransactionType = 'other', signers?: [], label: string = ""): Promise<web3.TransactionSignature> {
 
         if (curtx != null) {
             return Promise.reject(new Error("wait till current transaction is confirmed"));
@@ -358,6 +391,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
             authorized,
             authorizeState,
+            logout,
 
             // wallet
             solanaConnection: rpc_wrapper,
@@ -373,16 +407,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
             // setLang,
             connection: web3Handler,
 
-            projects
+            projects,
+            // newProjectAddress
         };
 
         return curCtx
 
     }, [,
-        authorized, authorizeState,
+        authorized, authorizeState,logout,
         rpc_wrapper, connectedWallet,
         curtx, userUpdatesCounter,
-        projects
+        projects,
+        // newProjectAddress
         // lang, 
     ]);
 

@@ -12,41 +12,68 @@ export interface ProjectContextType {
     triggerFetchUpdates()
 }
 
+export const ACTIVE_PROJECT_KEY = "active_project";
+
+export function setActiveProject(project_id: PublicKey, user: PublicKey) {
+
+    if (typeof window !== 'undefined') {
+        let cache_key = ACTIVE_PROJECT_KEY + '_' + user.toString();
+        window.localStorage.setItem(cache_key, project_id.toString())
+    }
+}
+export function getActiveProject(user: PublicKey): PublicKey | null {
+
+    if (typeof window !== 'undefined') {
+        let cache_key = ACTIVE_PROJECT_KEY + '_' + user.toString();
+
+        let addr = window.localStorage.getItem(cache_key);
+        if (addr != null) {
+            return new PublicKey(addr);
+        } else {
+            return null;
+        }
+    }
+}
+
 const ProjectContext = createContext({} as ProjectContextType);
 
-function ProjectContextProvider({children,project}: {children: JSX.Element, project: PublicKey}) {
+function ProjectContextProvider({ children, project }: { children: JSX.Element, project?: PublicKey }) {
 
-    const [items,setItems] = useState<SdkItem[]>([]);
+    const [items, setItems] = useState<SdkItem[]>([]);
 
-    const [updates,setUpdates] = useState(0);
+    const [updates, setUpdates] = useState(0);
     const [internal_updates, inc_internal_updates] = useState(0);
-    const [projectObject,set_project_object] = useState<SdkProject|null>(null);
+    const [projectObject, set_project_object] = useState<SdkProject | null>(null);
 
-    const {connection} = useAppContext();
+    const { connection } = useAppContext();
 
     const triggerFetchUpdates = () => {
-        setUpdates(updates+1);
+        setUpdates(updates + 1);
     };
 
     useEffect(() => {
 
-        (async () => {
-            const api = new Api(project);
+        if (project != null) {
+            (async () => {
+                const api = new Api(project);
 
-            let itemsRaw = await api.items();
+                let itemsRaw = await api.items();
 
-            if (itemsRaw != null) {
-                setItems(itemsRaw);
-            }
+                if (itemsRaw != null) {
+                    setItems(itemsRaw);
+                }
 
-            set_project_object(await SdkProject.fetch(connection, project));
+                set_project_object(await SdkProject.fetch(connection, project));
 
-            // trigger context update
-            inc_internal_updates(internal_updates + 1);
+                // trigger context update
+                inc_internal_updates(internal_updates + 1);
 
-        })();
-       
-    },[project,updates]);
+            })();
+        } else {
+            set_project_object(null);
+        }
+
+    }, [project, updates]);
 
     const memoedValue = useMemo(() => {
 
@@ -58,7 +85,7 @@ function ProjectContextProvider({children,project}: {children: JSX.Element, proj
         };
 
         return context;
-    },[internal_updates,items,project]);
+    }, [internal_updates, items, project]);
 
     return <ProjectContext.Provider value={memoedValue}>
         {children}

@@ -95,11 +95,11 @@ export default function LimitedItems() {
 
         let item = new PublicKey("7aD2mfnGR5Fu7i36gmns3VFSf33qVdMpYAUGUWfNY8Y8");
 
-        let listingInfo = await Listing.fetch(connection,item);
+        let listingInfo = await Listing.fetch(connection, item);
 
-        console.warn('listing info ',listingInfo.toJSON())
+        console.warn('listing info ', listingInfo.toJSON())
 
-        let txData = await fetch('https://cldfn.com/matosolana/project/' + project_id + '/market/buy/' + item + "/"+wallet.adapter.publicKey.toString());
+        let txData = await fetch('https://cldfn.com/matosolana/project/' + project_id + '/market/buy/' + item + "/" + wallet.adapter.publicKey.toString());
         let txJson = await txData.json();
 
 
@@ -120,7 +120,7 @@ export default function LimitedItems() {
     const testTx = async e => {
 
         let test_mint = items[0].mint;
-      
+
         let txData = await fetch('https://cldfn.com/matosolana/buy/' + test_mint + '/1/' + wallet.adapter.publicKey.toString());
         let txJson = await txData.json();
 
@@ -143,7 +143,7 @@ export default function LimitedItems() {
 
     const create_project = async e => {
 
-        const ix = new ChainSdk(wallet.adapter).createProject();
+        const [_, ix] = new ChainSdk(wallet.adapter).createProject();
 
         sendTx([ix], "system").catch((e) => {
             toast.error('unable to create project: ' + e.message)
@@ -155,10 +155,10 @@ export default function LimitedItems() {
         let mint = new PublicKey("41r8vUjmHuLXvC3VPqkJK9zxcWiFKYz6XtUr2JcFb3Xi");
 
 
-        const url = 'https://cldfn.com/matosolana/project/'+project_id+'/market/list/' + mint + '/' + wallet.adapter.publicKey.toString() + '?price_mint=4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU&price=100000';
+        const url = 'https://cldfn.com/matosolana/project/' + project_id + '/market/list/' + mint + '/' + wallet.adapter.publicKey.toString() + '?price_mint=4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU&price=100000';
         let txData = await fetch(url);
 
-        console.log('sent request to ',url)
+        console.log('sent request to ', url)
         let txJson = await txData.json();
 
 
@@ -169,7 +169,7 @@ export default function LimitedItems() {
 
         let rawtx = tx.serialize({ verifySignatures: false });
 
-        console.warn(bs58.encode(rawtx));
+        console.warn(tx.serializeMessage().toString("base64"));
 
         wallet.adapter.sendTransaction(tx, connection, {
             skipPreflight: true
@@ -178,12 +178,12 @@ export default function LimitedItems() {
     }
 
     return (<>
-        <Flex w="100%" p="1rem">
-            <p className="not-italic text-xl font-bold pl-2">Limited items</p>
-            <Spacer />
-            <Button colorScheme='teal' size='sm' onClick={onOpen}>
-                + item
+        <Flex justifySelf={"center"} p="1rem" paddingLeft={0}>
+
+            <Button colorScheme='green' size='sm' onClick={onOpen}>
+                + new item
             </Button>
+            {/*
             <Button colorScheme='teal' size='sm' onClick={list_item}>
                 list to market
             </Button>
@@ -198,14 +198,14 @@ export default function LimitedItems() {
             </Button>
             <Button onClick={create_escrow_payment_account}>
                 +escrow USDC wallet
-            </Button>
+            </Button> */}
 
         </Flex>
 
         <CreateLimitedItemForm isOpen={isOpen} onClose={onClose} onSave={onDataSave} />
 
         <TableContainer>
-            <Table variant='striped' size='sm'>
+            <Table variant="unstyled" size='sm'>
                 <TableCaption>List of limited items in shop</TableCaption>
                 <Thead>
                     <Tr>
@@ -219,7 +219,7 @@ export default function LimitedItems() {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {items.map((item) => (<LimitedRowItem key={item.mint} item={item}  />))}
+                    {items.map((item) => (<LimitedRowItem key={item.mint} item={item} />))}
                 </Tbody>
 
             </Table>

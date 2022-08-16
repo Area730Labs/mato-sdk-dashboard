@@ -34,7 +34,7 @@ export default function Login() {
 
   let msg = publicKey ? 'Sign a message in wallet to authorize' : 'Connecting wallet...';
 
-  if (AuthorizeState.noproject) {
+  if (authorizeState == AuthorizeState.noproject) {
     msg = 'Confirm project creation to continue';
   } 
 
@@ -53,7 +53,7 @@ export default function Login() {
         textAlign="center"
         transition="all .2s ease"
       >
-        <Text marginTop="25px" fontSize='xl' fontWeight="bold">MatoLabs dashboard</Text>
+        <Text marginTop="25px" fontSize='xl' fontWeight="bold">MatoLabs SDK</Text>
         <Box textAlign="center" marginLeft="50px">
           <Lottie
             loop

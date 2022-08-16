@@ -1,5 +1,5 @@
 import { createGameProject, CreateGameProjectAccounts, CreateGameProjectArgs } from "./generated/instructions/createGameProject";
-import { Keypair, SystemProgram, SYSVAR_RENT_PUBKEY, PublicKey } from "@solana/web3.js"
+import { Keypair, SystemProgram, SYSVAR_RENT_PUBKEY, PublicKey, TransactionInstruction } from "@solana/web3.js"
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { calcAddressWithSeed, calcAddressWithTwoSeeds, findAssociatedTokenAddress, string_to_buffer } from "../core/pdautils";
 import { createItem, CreateItemAccounts, CreateItemArgs } from "./generated/instructions/createItem";
@@ -109,10 +109,11 @@ class ChainSdk {
             itemId: id
         };
 
-        let payment_acc = findAssociatedTokenAddress(escrow_account[0],price_mint);
+        // let payment_acc = findAssociatedTokenAddress(escrow_account[0],price_mint);
         // calcAddressWithTwoSeeds("payment_acc",escrow_account[0].toBuffer(),price_mint);
 
-
+        let payment_acc = calcAddressWithTwoSeeds("payment_acc", price_mint.toBuffer(),escrow_account[0]);
+        
         // todo: add project authority
         const ixAccounts: CreateItemAccounts = {
             project: project_address,
@@ -124,7 +125,7 @@ class ChainSdk {
             tokenProgram: TOKEN_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
             mintAuthority: escrow_account[0],
-            paymentTokenAcc: payment_acc,
+            paymentTokenAcc: payment_acc[0],
             rent: SYSVAR_RENT_PUBKEY
         };
 
@@ -145,7 +146,7 @@ class ChainSdk {
         let listing_address = calcAddressWithTwoSeeds("listing",mint.toBuffer(),this.signer.publicKey);
         let market_escrow_tokenacc = calcAddressWithSeed("listing_tacc", listing_address[0]);
 
-        let seller_payment_acc = findAssociatedTokenAddress(this.signer.publicKey,price_mint);
+        // let seller_payment_acc = findAssociatedTokenAddress(this.signer.publicKey,price_mint);
         let seller_item_acc = findAssociatedTokenAddress(this.signer.publicKey,mint);
 
 
@@ -154,7 +155,6 @@ class ChainSdk {
             amount: new BN(sell_amount),
             expireAt: new BN(0)
         };
-
 
         // todo: add project authority
         const ixAccounts: MarketListAccounts = {
@@ -168,7 +168,7 @@ class ChainSdk {
             marketEscrow: market_escrow[0],
             marketEscrowTokenAccount: market_escrow_tokenacc[0],
             paymentTokenMint: price_mint,
-            paymentTokenAccount: seller_payment_acc,
+            // paymentTokenAccount: seller_payment_acc,
             sellerItemTokenAccount: seller_item_acc,
             rent: SYSVAR_RENT_PUBKEY
         };
@@ -176,7 +176,7 @@ class ChainSdk {
         return marketList(ixArgs, ixAccounts);
     }
 
-    createProject() {
+    createProject(): [PublicKey,TransactionInstruction] {
 
         const uid = new Keypair().publicKey;
 
@@ -201,7 +201,7 @@ class ChainSdk {
             systemProgram: SystemProgram.programId
         };
 
-        return createGameProject(ixArgs, ixAccounts);
+        return [project_addr,createGameProject(ixArgs, ixAccounts)];
     }
 }
 

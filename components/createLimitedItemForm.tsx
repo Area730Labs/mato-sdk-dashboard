@@ -20,10 +20,10 @@ import {
 import React, { useState } from "react";
 
 import Label from "./core/label";
-import { WarningIcon } from '@chakra-ui/icons'
+import { InfoIcon, WarningIcon } from '@chakra-ui/icons'
 import { PublicKey } from '@solana/web3.js';
 
-export interface CreateItemForm{
+export interface CreateItemForm {
     price: number,
     payment_mint: PublicKey,
     supply: number,
@@ -77,12 +77,12 @@ export default function CreateLimitedItemForm(props) {
     return (
         <Modal onClose={onClose} isOpen={props.isOpen} isCentered >
             <ModalOverlay />
-            <ModalContent borderRadius="24px" padding="4">
+            <ModalContent borderRadius="24px">
                 <ModalHeader position="relative">
                     <Label>Create new limited item</Label>
-                    <ModalCloseButton marginTop="2"/>
+                    <ModalCloseButton marginTop="2" />
                 </ModalHeader>
-              
+
                 <ModalBody>
                     <FormControl>
 
@@ -102,25 +102,27 @@ export default function CreateLimitedItemForm(props) {
                         </FormLabel>
 
                         <NumberInput>
-                                <NumberInputField
-                                    value={formValues.supply}
-                                    onChange={changeHandler}
-                                    name='supply'
-                                    placeholder='10000'
-                                />
+                            <NumberInputField
+                                value={formValues.supply}
+                                onChange={changeHandler}
+                                name='supply'
+                                placeholder='10000'
+                            />
                         </NumberInput>
 
                         <FormLabel mt='0.5rem'>
                             <Label>Price per item</Label>
                         </FormLabel>
                         <NumberInput>
-                            <Grid templateColumns='repeat(4, 1fr)' gap={6}>
-                                <NumberInputField
-                                    value={formValues.price}
-                                    onChange={changeHandler}
-                                    name='price'
-                                    placeholder='50'
-                                />
+                            <Grid templateColumns='repeat(5, 1fr)' gap={6}>
+                                <GridItem colSpan={2}>
+                                    <NumberInputField
+                                        value={formValues.price}
+                                        onChange={changeHandler}
+                                        name='price'
+                                        placeholder='50'
+                                    />
+                                </GridItem>
                                 <GridItem colSpan={3}>
                                     <Select placeholder={<Label>Payment token</Label>} value={formValues.payment_mint.toString()} onChange={changePaymentToken}>
                                         <option value={USDC_TOKEN.toString()}><Label>USDC</Label></option>
@@ -130,8 +132,8 @@ export default function CreateLimitedItemForm(props) {
                             </Grid>
                         </NumberInput>
                         <FormHelperText marginTop="20px">
-                            <WarningIcon marginRight="5px" />
-                            Please doublecheck everything as you will not be able to change it later, only create a new one
+                            <InfoIcon marginRight="5px" />
+                            Limited item means there's hard limit of items. Once all items are sold, there's no more items to come
                         </FormHelperText>
 
                     </FormControl>

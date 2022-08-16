@@ -297,7 +297,7 @@
         },
         {
           "name": "paymentTokenAcc",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -421,6 +421,14 @@
           },
           {
             "name": "marketEscrowBump",
+            "type": "u8"
+          },
+          {
+            "name": "secondarySellsTaxPercentBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "subscriptionLevel",
             "type": "u8"
           }
         ]
