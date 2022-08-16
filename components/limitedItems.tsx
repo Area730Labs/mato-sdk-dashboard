@@ -53,7 +53,7 @@ export default function LimitedItems() {
             } as Signer,
         ];
 
-        sendTx([ix], "system", signers).catch((e) => {
+        sendTx([ix], "create_item", signers,"Wait for item tx finalization").catch((e) => {
             console.error('unable to create an item: ', e)
         });
 
@@ -191,6 +191,7 @@ export default function LimitedItems() {
             <Button colorScheme='teal' size='sm' onClick={buy_market}>
                 buy on market
             </Button>
+            
             <Button colorScheme='teal' size='sm' onClick={testTx}>
                 test buy tx
             </Button>

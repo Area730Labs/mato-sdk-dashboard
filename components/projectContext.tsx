@@ -45,11 +45,16 @@ function ProjectContextProvider({ children, project }: { children: JSX.Element, 
     const [internal_updates, inc_internal_updates] = useState(0);
     const [projectObject, set_project_object] = useState<SdkProject | null>(null);
 
-    const { connection } = useAppContext();
+    const { connection, project_update_request } = useAppContext();
 
     const triggerFetchUpdates = () => {
         setUpdates(updates + 1);
     };
+
+    // handle extrnal update requests
+    useEffect(() => {
+        inc_internal_updates(internal_updates + 1); 
+    },[project_update_request])
 
     useEffect(() => {
 

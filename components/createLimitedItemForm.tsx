@@ -46,14 +46,11 @@ export default function CreateLimitedItemForm(props) {
 
     const saveHandler = e => {
 
-
         let payment_token_info = global_config.payment_tokens.find(x => {
             const result = x.mint.toString() == formValues.payment_mint.toString();
             return result;
         })
 
-
-        console.log('found',payment_token_info)
 
         let token_one = Math.pow(10,payment_token_info.decimals);
 

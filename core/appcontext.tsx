@@ -13,9 +13,8 @@ import Api from "../api/api";
 import { SdkProject } from "../api/api";
 import ChainSdk from "../chain/sdk";
 import { getActiveProject, setActiveProject } from "../components/projectContext";
-import { getActiveWallet } from "./auth";
 
-export type TransactionType = "system" | "signup" | "platform" | "other"
+export type TransactionType = "system" | "signup" | "platform" | "other" | "create_item"
 export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[], label?: string): Promise<web3.TransactionSignature> }
 
 export enum AuthorizeState {
@@ -49,6 +48,7 @@ export interface AppContextType {
 
     // app 
     projects: SdkProject[],
+    project_update_request: number,
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -75,6 +75,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const [authorizeState, setAuthorizedState] = useState<AuthorizeState>(AuthorizeState.initial);
     const [projects, setProjects] = useState<SdkProject[]>([]);
+    const [project_update_request,setProjectUpdateRequst] = useState(0);
 
     const logout = () => {
         setAuthorized(false);
@@ -130,7 +131,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
                                     let curProject = getActiveProject(connectedWallet.publicKey);
                                     if (curProject == null) {
                                         const first_project = api_projects[0].address;
-                                        setActiveProject(first_project,connectedWallet.publicKey);
+                                        setActiveProject(new web3.PublicKey(first_project),connectedWallet.publicKey);
                                         toast.info(`set current project to ${first_project}`)
                                     }
                                 });
@@ -284,8 +285,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
                     web3Handler.getSignatureStatus(curtx.Signature).then((resp) => {
                         if (resp.value.confirmationStatus == 'confirmed') {
                             setCurTxWrapper(null);
-                            resolve("confirmed")
-                            clearInterval(interval);
+
+                            if (curtx.Type === 'create_item') {
+                                clearInterval(interval);
+                                setTimeout(()  => {
+                                    resolve("confirmed")
+                                  
+                                },10000);
+                            } else {
+                                resolve("confirmed")
+                                clearInterval(interval);
+                            }
                         }
                     });
 
@@ -314,6 +324,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
                     case 'signup': {
                         setAuthorized(true);
                         setAuthorizedState(AuthorizeState.authorized);
+                        break;
+                    }
+                    case 'create_item': {
+
+                        // trigger external contect update 
+                        setProjectUpdateRequst(project_update_request + 1);
+
                         break;
                     }
                     default: {
@@ -409,6 +426,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
             projects,
             // newProjectAddress
+            project_update_request
         };
 
         return curCtx
@@ -418,6 +436,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         rpc_wrapper, connectedWallet,
         curtx, userUpdatesCounter,
         projects,
+        project_update_request
         // newProjectAddress
         // lang, 
     ]);
