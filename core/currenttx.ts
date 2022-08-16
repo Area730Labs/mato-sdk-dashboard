@@ -7,7 +7,7 @@ function getCurrentTxCacheKey(wallet: WalletAdapter): string {
     return `${current_tx_cache_prefix}_${wallet.publicKey}`;
 }
 
-interface CurrentTx {
+export interface CurrentTx {
     CreatedAt: number
     Signature: string
     Type: TransactionType
@@ -36,5 +36,5 @@ function getCurrentTx(wallet: WalletAdapter): CurrentTx | null {
 }
 
 export {
-    getCurrentTx, storeCurrentTx, CurrentTx
+    getCurrentTx, storeCurrentTx
 }

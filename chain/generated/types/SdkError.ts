@@ -1,7 +1,22 @@
-import { PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh"
+
+export type SdkErrorKind =
+  | WalletAccountIsWrong
+  | PriceError
+  | AllItemsAreSold
+  | NotEnoughFunds
+  | ObjectIdTooLong
+  | MarketEscrowError
+  | ListingInfoHacked
+
+  export type SdkErrorJSON =
+  | WalletAccountIsWrongJSON
+  | PriceErrorJSON
+  | AllItemsAreSoldJSON
+  | NotEnoughFundsJSON
+  | ObjectIdTooLongJSON
+  | MarketEscrowErrorJSON
+  | ListingInfoHackedJSON
 
 export interface WalletAccountIsWrongJSON {
   kind: "WalletAccountIsWrong"
@@ -151,7 +166,7 @@ export class ListingInfoHacked {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function fromDecoded(obj: any): types.SdkErrorKind {
+export function fromDecoded(obj: any): SdkErrorKind {
   if (typeof obj !== "object") {
     throw new Error("Invalid enum object")
   }
@@ -181,7 +196,7 @@ export function fromDecoded(obj: any): types.SdkErrorKind {
   throw new Error("Invalid enum object")
 }
 
-export function fromJSON(obj: types.SdkErrorJSON): types.SdkErrorKind {
+export function fromJSON(obj: SdkErrorJSON): SdkErrorKind {
   switch (obj.kind) {
     case "WalletAccountIsWrong": {
       return new WalletAccountIsWrong()

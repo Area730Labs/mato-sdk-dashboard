@@ -131,9 +131,9 @@ export default function CreateLimitedItemForm(props) {
                                     />
                                 </GridItem>
                                 <GridItem colSpan={3}>
-                                    <Select placeholder={<Label>Payment token</Label>} value={formValues.payment_mint.toString()} onChange={changePaymentToken}>
+                                    <Select placeholder={"Payment token"} value={formValues.payment_mint.toString()} onChange={changePaymentToken}>
                                         {global_config.payment_tokens.map(item =>
-                                            <option value={item.mint.toString()}><Label>{item.name}</Label></option>
+                                            <option key={item.mint.toString()} value={item.mint.toString()}><Label>{item.name}</Label></option>
                                         )}
                                     </Select>
                                 </GridItem>

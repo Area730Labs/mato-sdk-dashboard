@@ -7,10 +7,10 @@ import BN from "bn.js"
 import {
     TOKEN_PROGRAM_ID,createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
-import { SdkProject } from "./generated/accounts";
+import { SdkProject } from "./generated/accounts/SdkProject";
 import { buyGameItem, BuyGameItemAccounts, BuyGameItemArgs } from "./generated/instructions/buyGameItem";
 import { SdkItemMeta } from "./generated/accounts/SdkItemMeta";
-import { marketList, MarketListAccounts, MarketListArgs } from "./generated/instructions";
+import { marketList, MarketListAccounts, MarketListArgs } from "./generated/instructions/marketList";
 
 class ChainSdk {
 

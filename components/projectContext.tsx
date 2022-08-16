@@ -2,7 +2,7 @@ import { PublicKey } from "@solana/web3.js";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import Api, { SdkItem } from "../api/api";
-import { SdkProject } from "../chain/generated/accounts";
+import { SdkProject } from "../chain/generated/accounts/SdkProject";
 import { useAppContext } from "../core/appcontext";
 
 export interface ProjectContextType {

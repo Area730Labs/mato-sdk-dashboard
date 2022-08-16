@@ -8,6 +8,7 @@ import {
     SystemProps,
 } from '@chakra-ui/react'
 import { withTheme } from '@emotion/react';
+import { PublicKey } from '@solana/web3.js';
 import Image from 'next/image'
 import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -98,7 +99,7 @@ export default function LimitedRowItem(props: LimitedRowItemProps) {
                 }}
 
             >
-                <Address addr={item.mint}/> <CopyIcon style={{ opacity: mintHover ? 1 : 0 }} />
+                <Address addr={new PublicKey(item.mint)}/> <CopyIcon style={{ opacity: mintHover ? 1 : 0 }} />
             </Td>
             <Td isNumeric>{item.supply.toString().toLocaleString()}</Td>
             <Td isNumeric>{price_value} {payment_info.info.name}</Td>
