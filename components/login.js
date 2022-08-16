@@ -54,6 +54,12 @@ export default function Login() {
         transition="all .2s ease"
       >
         <Text marginTop="25px" fontSize='xl' fontWeight="bold">MatoLabs SDK</Text>
+        <Box width="300px" backgroundColor="red.200" color="black" padding="8px" borderRadius="10px" alignSelf="center" marginTop="0">
+          <Text fontSize="md" textAlign="center">
+            This is a preview devnet version
+          </Text>
+        </Box>
+        <Text fontSize="xs">solely for Solana Summer Camp</Text>
         <Box textAlign="center" marginLeft="50px">
           <Lottie
             loop
@@ -108,11 +114,7 @@ export default function Login() {
             <link rel="icon" href="/favicon.ico" />
           </Head>
 
-          <Box backgroundColor="orange" padding="15px" borderRadius="10px">
-            <Text fontSize="xl" color="white">
-              This is a preview devnet version for <Link href="https://solana.com/summercamp">Solana Summer Camp</Link>
-            </Text>
-          </Box>
+
           <Box className={styles.main}>
             {inProgress && (
               <>
